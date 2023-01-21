@@ -42,7 +42,7 @@ namespace eCommerce.API.Repositories
 
         public void Delete(int id)
         {
-            _db.Remove(_db.FirstOrDefault(a => a.Id == id));
+            _connection.Execute("DELETE FROM Usuarios WHERE Id = @Id", new { Id = id });
         }
 
         private static List<Usuario> _db = new List<Usuario>()
