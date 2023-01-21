@@ -111,14 +111,12 @@ namespace eCommerce.API.Repositories
         public void Insert(Usuario usuario)
         {
             _connection.Open();
-
             var transaction = _connection.BeginTransaction();
-
             try
             {
                 string sql = "INSERT INTO Usuarios" +
                              "(Nome, Email, Sexo, RG, CPF, NomeMae, SituacaoCadastro, DataCadastro) " +
-                             "VALUES (@Nome, @Email, @Sexo, @RG, @CPF, @NomeMae, @SituacaoCadastro, @DataCadastro);" +
+                             "VALUES (@Nome, @Email, @Sexo, @RG, @CPF, @NomeMae, @SituacaoCadastro, @DataCadastro); " +
                              "SELECT CAST(SCOPE_IDENTITY() AS INT);";
                 usuario.Id = _connection.Query<int>(sql, usuario, transaction).Single();
 
@@ -145,9 +143,20 @@ namespace eCommerce.API.Repositories
                     }
                 }
 
+                if (usuario.Departamentos != null && usuario.Departamentos.Count > 0)
+                {
+                    foreach (var departamento in usuario.Departamentos)
+                    {
+                        string sqlUsuariosDepartamentos = "INSERT INTO UsuariosDepartamentos " +
+                                                          "(UsuarioId, DepartamentoId) " +
+                                                          "VALUES (@UsuarioId, @DepartamentoId)";
+                        _connection.Execute(sqlUsuariosDepartamentos, new { UsuarioId = usuario.Id, DepartamentoId = departamento.Id }, transaction);
+                    }
+                }
+
                 transaction.Commit();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 try
                 {
