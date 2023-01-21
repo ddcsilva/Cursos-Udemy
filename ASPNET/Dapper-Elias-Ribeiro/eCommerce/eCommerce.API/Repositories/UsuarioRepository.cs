@@ -5,7 +5,6 @@ using System.Linq;
 using Dapper;
 using eCommerce.API.Models;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
 namespace eCommerce.API.Repositories
 {
@@ -20,15 +19,42 @@ namespace eCommerce.API.Repositories
 
         public List<Usuario> Get()
         {
-            return _connection.Query<Usuario>("SELECT * FROM Usuarios").ToList();
+            //return _connection.Query<Usuario>("SELECT * FROM Usuarios").ToList();
+
+            List<Usuario> usuarios = new List<Usuario>();
+
+            string sql = "SELECT * " +
+                         "FROM Usuarios AS U " +
+                         "LEFT JOIN Contatos C ON C.UsuarioId = U.Id " +
+                         "LEFT JOIN EnderecosEntrega EE ON EE.UsuarioId = U.Id";
+
+            _connection.Query<Usuario, Contato, EnderecoEntrega, Usuario>(sql,
+                (usuario, contato, enderecoEntrega) => {
+
+                    if (usuarios.SingleOrDefault(a => a.Id == usuario.Id) == null)
+                    {
+                        usuario.EnderecosEntrega = new List<EnderecoEntrega>();
+                        usuario.Contato = contato;
+                        usuarios.Add(usuario);
+                    }
+                    else
+                    {
+                        usuario = usuarios.SingleOrDefault(a => a.Id == usuario.Id);
+                    }
+
+                    usuario.EnderecosEntrega.Add(enderecoEntrega);
+                    return usuario;
+                });
+
+            return usuarios;
         }
 
         public Usuario Get(int id)
         {
             return _connection.Query<Usuario, Contato, Usuario>(
-                @"SELECT * FROM Usuarios as U 
-                      LEFT JOIN Contatos C ON C.UsuarioId = U.Id 
-                      WHERE U.Id = @Id",
+                "SELECT * FROM Usuarios as U " +
+                    "LEFT JOIN Contatos C ON C.UsuarioId = U.Id " +
+                    "WHERE U.Id = @Id",
                 (usuario, contato) =>
                 {
                     usuario.Contato = contato;
@@ -46,19 +72,19 @@ namespace eCommerce.API.Repositories
 
             try
             {
-                string sql = @"INSERT INTO Usuarios
-                           (Nome, Email, Sexo, RG, CPF, NomeMae, SituacaoCadastro, DataCadastro) 
-                           VALUES (@Nome, @Email, @Sexo, @RG, @CPF, @NomeMae, @SituacaoCadastro, @DataCadastro); 
-                           SELECT CAST(SCOPE_IDENTITY() AS INT);";
+                string sql = "INSERT INTO Usuarios" +
+                             "(Nome, Email, Sexo, RG, CPF, NomeMae, SituacaoCadastro, DataCadastro) " +
+                             "VALUES (@Nome, @Email, @Sexo, @RG, @CPF, @NomeMae, @SituacaoCadastro, @DataCadastro);" +
+                             "SELECT CAST(SCOPE_IDENTITY() AS INT);";
                 usuario.Id = _connection.Query<int>(sql, usuario, transaction).Single();
 
                 if (usuario.Contato != null)
                 {
                     usuario.Contato.UsuarioId = usuario.Id;
-                    string sqlContato = @"INSERT INTO Contatos
-                                      (UsuarioId, Telefone, Celular) 
-                                      VALUES (@UsuarioId, @Telefone, @Celular); 
-                                      SELECT CAST(SCOPE_IDENTITY() AS INT);";
+                    string sqlContato = "INSERT INTO Contatos" +
+                                        "(UsuarioId, Telefone, Celular) " +
+                                        "VALUES (@UsuarioId, @Telefone, @Celular); " +
+                                        "SELECT CAST(SCOPE_IDENTITY() AS INT);";
                     usuario.Contato.Id = _connection.Query<int>(sqlContato, usuario.Contato, transaction).Single();
                 }
 
@@ -122,14 +148,9 @@ namespace eCommerce.API.Repositories
 
         public void Delete(int id)
         {
-            _connection.Execute("DELETE FROM Usuarios WHERE Id = @Id", new { Id = id });
+            string sql = "DELETE FROM Usuarios" +
+                         "WHERE Id = @Id";
+            _connection.Execute(sql, new { Id = id });
         }
-
-        private static List<Usuario> _db = new List<Usuario>()
-        {
-            new Usuario(){ Id=1, Nome="Filipe Rodrigues", Email="filipe.rodrigues@gmail.com" },
-            new Usuario(){ Id=2, Nome="Marcelo Rodrigues", Email="marcelo.rodrigues@gmail.com"},
-            new Usuario(){ Id=3, Nome="Jessica Rodrigues", Email="jessica.rodrigues@gmail.com"}
-        };
     }
 }
