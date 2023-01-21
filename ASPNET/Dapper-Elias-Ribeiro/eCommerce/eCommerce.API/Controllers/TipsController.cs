@@ -1,6 +1,8 @@
 ﻿using System.Data;
 using System.Linq;
 using Dapper;
+using Dapper.FluentMap;
+using eCommerce.API.Mappers;
 using eCommerce.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -58,6 +60,43 @@ namespace eCommerce.API.Controllers
         {
             var usuarios = _connection.Query<Usuario>("SelecionarUsuario", new { Id = id }, commandType: CommandType.StoredProcedure);
 
+            return Ok(usuarios);
+        }
+
+        [HttpGet("mapper1/usuarios")]
+        public IActionResult Mapper1()
+        {
+            /*
+             * Prblema: Mapear colunas com nomes diferentes das propriedades do objeto.
+             * Solução 01: SQL(MER) => Renomear a coluna.
+             */
+            string sql = "SELECT " +
+                            "Id Cod, " +
+                            "Nome NomeCompleto, " +
+                            "Email, " +
+                            "Sexo, " +
+                            "RG, " +
+                            "CPF, " +
+                            "NomeMae NomeCompletoMae, " +
+                            "SituacaoCadastro Situacao, " +
+                            "DataCadastro " +
+                         "FROM Usuarios";
+            var usuarios = _connection.Query<UsuarioTwo>(sql);
+
+            return Ok(usuarios);
+        }
+
+        [HttpGet("mapper2/usuarios")]
+        public IActionResult Mapper2()
+        {
+            FluentMapper.Initialize(config => {
+                config.AddMap(new UsuarioTwoMap());
+            });
+            /*
+             * Prblema: Mapear colunas com nomes diferentes das propriedades do objeto.
+             * Solução 02: C#(POO) => Mapeamento por meio da Biblioteca Dapper.FluentMap.
+             */
+            var usuarios = _connection.Query<UsuarioTwo>("SELECT * FROM Usuarios;");
             return Ok(usuarios);
         }
     }
