@@ -8,9 +8,10 @@ namespace GeekShopping.ProdutoAPI.Model.Context;
 public class MySqlContext : DbContext
 {
     public MySqlContext() { }
+
     public MySqlContext(DbContextOptions<MySqlContext> options) : base(options) { }
 
-    public DbSet<Produto> Produtos { get; set; }
+    public DbSet<Produto> Produtos { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

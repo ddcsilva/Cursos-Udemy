@@ -25,7 +25,7 @@ public class ProdutoRepository : IProdutoRepository
 
     public async Task<ProdutoVO> BuscarPorId(long id)
     {
-        Produto produto = await _context.Produtos.FindAsync(id);
+        Produto produto = await _context.Produtos.FindAsync(id) ?? new Produto();
         return _mapper.Map<ProdutoVO>(produto);
     }
 
@@ -51,9 +51,9 @@ public class ProdutoRepository : IProdutoRepository
     {
         try
         {
-            Produto produto = await _context.Produtos.FindAsync(id);
+            Produto produto = await _context.Produtos.FindAsync(id) ?? new Produto();
 
-            if (produto == null) return false;
+            if (produto.Id == 0) return false;
 
             _context.Produtos.Remove(produto);
             await _context.SaveChangesAsync();

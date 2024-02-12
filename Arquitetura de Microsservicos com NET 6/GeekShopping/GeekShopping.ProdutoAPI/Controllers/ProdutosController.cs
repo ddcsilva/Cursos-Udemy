@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GeekShopping.ProdutoAPI.Controllers;
 
+/// <summary>
+/// Controller de produtos
+/// </summary>
 [Route("api/v1/[controller]")]
 [ApiController]
 public class ProdutosController : ControllerBase
@@ -26,7 +29,7 @@ public class ProdutosController : ControllerBase
     public async Task<ActionResult<ProdutoVO>> BuscarPorId(long id)
     {
         var produto = await _produtoRepository.BuscarPorId(id);
-        if (produto == null) return NotFound();
+        if (produto.Id <= 0) return NotFound();
         return Ok(produto);
     }
 
