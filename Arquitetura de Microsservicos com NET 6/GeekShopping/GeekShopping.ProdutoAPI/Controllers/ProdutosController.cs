@@ -29,4 +29,28 @@ public class ProdutosController : ControllerBase
         if (produto == null) return NotFound();
         return Ok(produto);
     }
+
+    [HttpPost]
+    public async Task<ActionResult<ProdutoVO>> Inserir(ProdutoVO produtoVO)
+    {
+        if (produtoVO == null) return BadRequest();
+        var produtoInserido = await _produtoRepository.Inserir(produtoVO);
+        return Ok(produtoInserido);
+    }
+
+    [HttpPut]
+    public async Task<ActionResult<ProdutoVO>> Atualizar(ProdutoVO produtoVO)
+    {
+        if (produtoVO == null) return BadRequest();
+        var produtoAtualizado = await _produtoRepository.Atualizar(produtoVO);
+        return Ok(produtoAtualizado);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Excluir(long id)
+    {
+        var status = await _produtoRepository.Excluir(id);
+        if (!status) return BadRequest();
+        return Ok(status);
+    }
 }
