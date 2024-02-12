@@ -4,6 +4,9 @@ using GeekShopping.ProdutoAPI.Model.Base;
 
 namespace GeekShopping.ProdutoAPI.Model;
 
+/// <summary>
+/// Classe de Produto
+/// </summary>
 [Table("produto")]
 public class Produto : BaseEntity
 {

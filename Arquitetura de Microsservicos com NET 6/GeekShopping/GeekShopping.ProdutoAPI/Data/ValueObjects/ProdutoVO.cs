@@ -1,5 +1,8 @@
 namespace GeekShopping.ProdutoAPI.Data.ValueObjects;
 
+/// <summary>
+/// Classe de Value Object para Produto
+/// </summary>
 public class ProdutoVO
 {
     public long Id { get; set; }

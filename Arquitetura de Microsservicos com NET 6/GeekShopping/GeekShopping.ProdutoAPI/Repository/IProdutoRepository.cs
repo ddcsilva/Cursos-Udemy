@@ -2,6 +2,9 @@ using GeekShopping.ProdutoAPI.Data.ValueObjects;
 
 namespace GeekShopping.ProdutoAPI.Repository;
 
+/// <summary>
+/// Interface de Produto Repository
+/// </summary>
 public interface IProdutoRepository
 {
     Task<IEnumerable<ProdutoVO>> BuscarTodos();
