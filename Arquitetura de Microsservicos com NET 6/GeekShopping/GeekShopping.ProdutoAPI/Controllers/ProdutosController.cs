@@ -34,7 +34,7 @@ public class ProdutosController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ProdutoVO>> Inserir(ProdutoVO produtoVO)
+    public async Task<ActionResult<ProdutoVO>> Inserir([FromBody] ProdutoVO produtoVO)
     {
         if (produtoVO == null) return BadRequest();
         var produtoInserido = await _produtoRepository.Inserir(produtoVO);
@@ -42,7 +42,7 @@ public class ProdutosController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<ActionResult<ProdutoVO>> Atualizar(ProdutoVO produtoVO)
+    public async Task<ActionResult<ProdutoVO>> Atualizar([FromBody] ProdutoVO produtoVO)
     {
         if (produtoVO == null) return BadRequest();
         var produtoAtualizado = await _produtoRepository.Atualizar(produtoVO);
