@@ -18,7 +18,7 @@ public static class HttpClientExtensions
     /// <param name="response">A resposta da requisição HTTP.</param>
     /// <returns>O conteúdo da resposta deserializado para o tipo especificado.</returns>
     /// <exception cref="ApplicationException">Lançada se a resposta não for bem-sucedida ou a deserialização falhar.</exception>
-    public static async Task<T> LerConteudoComo<T>(this HttpResponseMessage response)
+    public static async Task<T> ReadContentAs<T>(this HttpResponseMessage response)
     {
         if (!response.IsSuccessStatusCode)
         {
