@@ -17,13 +17,13 @@ public class ProdutoRepository : IProdutoRepository
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ProdutoVO>> BuscarTodos()
+    public async Task<IEnumerable<ProdutoVO>> ObterTodos()
     {
         List<Produto> produtos = await _context.Produtos.ToListAsync();
         return _mapper.Map<List<ProdutoVO>>(produtos);
     }
 
-    public async Task<ProdutoVO> BuscarPorId(long id)
+    public async Task<ProdutoVO> ObterPorId(long id)
     {
         Produto produto = await _context.Produtos.FindAsync(id) ?? new Produto();
         return _mapper.Map<ProdutoVO>(produto);

@@ -19,16 +19,16 @@ public class ProdutosController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProdutoVO>>> BuscarTodos()
+    public async Task<ActionResult<IEnumerable<ProdutoVO>>> ObterTodos()
     {
-        var produtos = await _produtoRepository.BuscarTodos();
+        var produtos = await _produtoRepository.ObterTodos();
         return Ok(produtos);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ProdutoVO>> BuscarPorId(long id)
+    public async Task<ActionResult<ProdutoVO>> ObterPorId(long id)
     {
-        var produto = await _produtoRepository.BuscarPorId(id);
+        var produto = await _produtoRepository.ObterPorId(id);
         if (produto.Id <= 0) return NotFound();
         return Ok(produto);
     }

@@ -8,17 +8,17 @@ namespace GeekShopping.ProdutoAPI.Repository;
 public interface IProdutoRepository
 {
     /// <summary>
-    /// Método responsável por buscar todos os produtos
+    /// Método responsável por obter todos os produtos
     /// </summary>
     /// <returns>Retorna uma lista de produtos</returns>
-    Task<IEnumerable<ProdutoVO>> BuscarTodos();
+    Task<IEnumerable<ProdutoVO>> ObterTodos();
 
     /// <summary>
-    /// Método responsável por buscar um produto por id
+    /// Método responsável por obter um produto por id
     /// </summary>
     /// <param name="id">Id do produto</param>
     /// <returns>Retorna um produto</returns>
-    Task<ProdutoVO> BuscarPorId(long id);
+    Task<ProdutoVO> ObterPorId(long id);
 
     /// <summary>
     /// Método responsável por inserir um produto
