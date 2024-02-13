@@ -46,7 +46,7 @@ public static class HttpClientExtensions
     /// <param name="url">A URL para a qual a requisição será enviada.</param>
     /// <param name="dados">O objeto a ser serializado para JSON e enviado.</param>
     /// <returns>Uma tarefa que representa a operação assíncrona, contendo a resposta da requisição HTTP.</returns>
-    public static Task<HttpResponseMessage> PostarComoJsonAsync<T>(this HttpClient httpClient, string url, T dados)
+    public static Task<HttpResponseMessage> PostAsJsonAsync<T>(this HttpClient httpClient, string url, T dados)
     {
         var dadosString = JsonSerializer.Serialize(dados);
         var conteudo = new StringContent(dadosString);
@@ -62,7 +62,7 @@ public static class HttpClientExtensions
     /// <param name="url">A URL para a qual a requisição será enviada.</param>
     /// <param name="dados">O objeto a ser serializado para JSON e enviado.</param>
     /// <returns>Uma tarefa que representa a operação assíncrona, contendo a resposta da requisição HTTP.</returns>
-    public static Task<HttpResponseMessage> AtualizarComoJsonAsync<T>(this HttpClient httpClient, string url, T dados)
+    public static Task<HttpResponseMessage> PutAsJsonAsync<T>(this HttpClient httpClient, string url, T dados)
     {
         var dadosString = JsonSerializer.Serialize(dados);
         var conteudo = new StringContent(dadosString);
