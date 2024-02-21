@@ -1,5 +1,8 @@
 ﻿namespace NZWalks.API.Models.Domain;
 
+/// <summary>
+/// Entidade que representa uma região.
+/// </summary>
 public class Regiao
 {
     public Guid Id { get; set; }

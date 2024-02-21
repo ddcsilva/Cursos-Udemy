@@ -1,5 +1,8 @@
 ﻿namespace NZWalks.API.Models.Domain;
 
+/// <summary>
+/// Entidade que representa uma trilha.
+/// </summary>
 public class Trilha
 {
     public Guid Id { get; set; }
