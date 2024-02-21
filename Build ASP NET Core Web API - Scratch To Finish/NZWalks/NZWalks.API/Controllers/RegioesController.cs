@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.Data;
+using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
 
 namespace NZWalks.API.Controllers;
@@ -30,10 +31,10 @@ public class RegioesController : ControllerBase
         var regioes = _context.Regioes.ToList();
 
         // Mapeando os dados para um DTO (Data Transfer Object).
-        var regioesDto = new List<RegiaoDTO>();
+        var regioesDTO = new List<RegiaoDTO>();
         foreach (var regiaoDomain in regioes)
         {
-            regioesDto.Add(new RegiaoDTO
+            regioesDTO.Add(new RegiaoDTO
             {
                 Id = regiaoDomain.Id,
                 Codigo = regiaoDomain.Codigo,
@@ -46,6 +47,11 @@ public class RegioesController : ControllerBase
         return Ok(regioes);
     }
 
+    /// <summary>
+    /// Action para obter uma região pelo seu ID.
+    /// </summary>
+    /// <param name="id"> ID da região. </param>
+    /// <returns> Região. </returns>
     [HttpGet]
     [Route("{id:Guid}")]
     public IActionResult ObterPorId([FromRoute] Guid id) // FromRoute é um atributo que indica que o parâmetro vem da rota.
@@ -61,7 +67,7 @@ public class RegioesController : ControllerBase
         }
 
         // Mapeando os dados para um DTO (Data Transfer Object).
-        var regiaoDto = new RegiaoDTO
+        var regiaoDTO = new RegiaoDTO
         {
             Id = regiao.Id,
             Codigo = regiao.Codigo,
@@ -69,6 +75,35 @@ public class RegioesController : ControllerBase
             ImagemUrl = regiao.ImagemUrl
         };
 
-        return Ok(regiaoDto);
+        return Ok(regiaoDTO);
+    }
+
+    [HttpPost]
+    public IActionResult Cadastrar([FromBody] CadastrarRegiaoRequestDTO request)
+    {
+        // Mapeando ou Convertendo os dados do DTO para o Domain Model.
+        var regiao = new Regiao
+        {
+            Codigo = request.Codigo,
+            Nome = request.Nome,
+            ImagemUrl = request.ImagemUrl
+        };
+
+        // Adicionando a entidade ao contexto.
+        _context.Regioes.Add(regiao);
+        _context.SaveChanges();
+
+        // Mapeando os dados para um DTO (Data Transfer Object).
+        var regiaoDTO = new RegiaoDTO
+        {
+            Id = regiao.Id,
+            Codigo = regiao.Codigo,
+            Nome = regiao.Nome,
+            ImagemUrl = regiao.ImagemUrl
+        };
+
+        // CreatedAtAction() é um método que retorna um status 201.
+        // Ele também retorna um cabeçalho Location com a URL para obter a entidade criada.
+        return CreatedAtAction(nameof(ObterPorId), new { id = regiao.Id }, regiao);
     }
 }
