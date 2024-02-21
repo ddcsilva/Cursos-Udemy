@@ -59,7 +59,7 @@ public class ProdutoService : IProdutoService
     public async Task<ProdutoModel> AtualizarProduto(ProdutoModel model)
     {
         // Faz a requisição PUT para a API de produtos com o modelo do produto
-        var response = await _client.PutAsJsonAsync($"{BasePath}/{model.Id}", model);
+        var response = await _client.PutAsJsonAsync(BasePath, model);
 
         if (!response.IsSuccessStatusCode)
         {
