@@ -5,6 +5,7 @@
 /// </summary>
 public class Trilha
 {
+    // Guid é um tipo de dado que representa um identificador único.
     public Guid Id { get; set; }
     public string Nome { get; set; }
     public string Descricao { get; set; }
@@ -13,8 +14,7 @@ public class Trilha
     public Guid DificuldadeId { get; set; }
     public Guid RegiaoId { get; set; }
 
-
-    // Propriedades de Navegação
+    // Propriedades de Navegação -> São propriedades que representam relacionamentos entre entidades.
     public Dificuldade Dificuldade { get; set; }
     public Regiao Regiao { get; set; }
 }
