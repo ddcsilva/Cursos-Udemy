@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
@@ -24,29 +25,14 @@ public class RegioesController : ControllerBase
     /// </summary>
     /// <returns> Lista de regiões. </returns>
     [HttpGet]
-    public IActionResult ObterTodos()
+    public async Task<IActionResult> ObterTodos()
     {
-        /*
-            Mocks para exemplo:
-            Id: 1
-            Codigo: NOR
-            Nome: Northland
-            ImagemUrl: https://www.doc.govt.nz/globalassets/images/conservation/parks-and-recreation/places-to-visit/northland/northland-landscape.jpg
-
-            Id: 2
-            Codigo: AUC
-            Nome: Auckland
-            ImagemUrl: https://www.doc.govt.nz/globalassets/images/conservation/parks-and-recreation/places-to-visit/auckland/auckland-landscape.jpg
-
-            Id: 3
-            Codigo: WAI
-            Nome: Waikato
-            ImagemUrl: https://www.doc.govt.nz/globalassets/images/conservation/parks-and-recreation/places-to-visit/waikato/waikato-landscape.jpg
-        */
+        // A vantagem de usar async/await é que a thread do servidor não é bloqueada enquanto a query é executada.
+        // Isso permite que o servidor atenda a mais requisições.
 
         // Obtendo dados do banco de dados. Domain Model.
         // ToList() é um método de extensão que executa a query no banco de dados e retorna uma lista.
-        var regioes = _context.Regioes.ToList();
+        var regioes = await _context.Regioes.ToListAsync();
 
         // Mapeando os dados para um DTO (Data Transfer Object).
         var regioesDTO = new List<RegiaoDTO>();
@@ -72,11 +58,12 @@ public class RegioesController : ControllerBase
     /// <returns> Região. </returns>
     [HttpGet]
     [Route("{id:Guid}")]
-    public IActionResult ObterPorId([FromRoute] Guid id) // FromRoute é um atributo que indica que o parâmetro vem da rota.
+    public async Task<IActionResult> ObterPorId([FromRoute] Guid id) // FromRoute é um atributo que indica que o parâmetro vem da rota.
     {
         // Obtendo dados do banco de dados. Domain Model.
         // Find() é um método do Entity Framework que busca uma entidade pelo seu ID.
-        var regiao = _context.Regioes.Find(id);
+        // FirstOrDefault() é um método do Entity Framework que busca uma entidade com base em um predicado.
+        var regiao = await _context.Regioes.FirstOrDefaultAsync(r => r.Id == id);
 
         if (regiao == null)
         {
@@ -102,7 +89,7 @@ public class RegioesController : ControllerBase
     /// <param name="request"> DTO com os dados da região. </param>
     /// <returns> Região cadastrada. </returns>
     [HttpPost]
-    public IActionResult Cadastrar([FromBody] CadastrarRegiaoRequestDTO request)
+    public async Task<IActionResult> Cadastrar([FromBody] CadastrarRegiaoRequestDTO request)
     {
         // Mapeando ou Convertendo os dados do DTO para o Domain Model.
         var regiao = new Regiao
@@ -113,8 +100,8 @@ public class RegioesController : ControllerBase
         };
 
         // Adicionando a entidade ao contexto.
-        _context.Regioes.Add(regiao);
-        _context.SaveChanges();
+        await _context.Regioes.AddAsync(regiao);
+        await _context.SaveChangesAsync();
 
         // Mapeando os dados para um DTO (Data Transfer Object).
         var regiaoDTO = new RegiaoDTO
@@ -138,11 +125,11 @@ public class RegioesController : ControllerBase
     /// <returns> Região atualizada. </returns>
     [HttpPut]
     [Route("{id:Guid}")]
-    public IActionResult Atualizar([FromRoute] Guid id, [FromBody] AtualizarRegiaoRequestDTO request)
+    public async Task<IActionResult> Atualizar([FromRoute] Guid id, [FromBody] AtualizarRegiaoRequestDTO request)
     {
         // Obtendo dados do banco de dados. Domain Model.
         // FirstOrDefault() é um método do Entity Framework que busca uma entidade com base em um predicado.
-        var regiao = _context.Regioes.FirstOrDefault(r => r.Id == id);
+        var regiao = await _context.Regioes.FirstOrDefaultAsync(r => r.Id == id);
 
         if (regiao == null)
         {
@@ -157,7 +144,7 @@ public class RegioesController : ControllerBase
 
         // Atualizando a entidade no contexto.
         // Não é necessário chamar o método Update() do DbSet, pois o Entity Framework rastreia as entidades.
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
         // Mapeando os dados para um DTO (Data Transfer Object).
         var regiaoDTO = new RegiaoDTO
@@ -174,10 +161,10 @@ public class RegioesController : ControllerBase
 
     [HttpDelete]
     [Route("{id:Guid}")]
-    public IActionResult Deletar([FromRoute] Guid id)
+    public async Task<IActionResult> Deletar([FromRoute] Guid id)
     {
         // Obtendo dados do banco de dados. Domain Model.
-        var regiao = _context.Regioes.FirstOrDefault(r => r.Id == id);
+        var regiao = await _context.Regioes.FirstOrDefaultAsync(r => r.Id == id);
 
         if (regiao == null)
         {
@@ -187,7 +174,7 @@ public class RegioesController : ControllerBase
 
         // Removendo a entidade do contexto.
         _context.Regioes.Remove(regiao);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
         // Mapeando os dados para um DTO (Data Transfer Object).
         var regiaoDTO = new RegiaoDTO
