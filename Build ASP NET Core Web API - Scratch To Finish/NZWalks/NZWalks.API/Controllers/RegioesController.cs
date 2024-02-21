@@ -130,6 +130,12 @@ public class RegioesController : ControllerBase
         return CreatedAtAction(nameof(ObterPorId), new { id = regiao.Id }, regiao);
     }
 
+    /// <summary>
+    /// Action para atualizar uma região.
+    /// </summary>
+    /// <param name="id"> ID da região. </param>
+    /// <param name="request"> DTO com os dados da região. </param>
+    /// <returns> Região atualizada. </returns>
     [HttpPut]
     [Route("{id:Guid}")]
     public IActionResult Atualizar([FromRoute] Guid id, [FromBody] AtualizarRegiaoRequestDTO request)
@@ -140,6 +146,7 @@ public class RegioesController : ControllerBase
 
         if (regiao == null)
         {
+            // NotFound() é um método que retorna um status 404.
             return NotFound();
         }
 
@@ -150,6 +157,36 @@ public class RegioesController : ControllerBase
 
         // Atualizando a entidade no contexto.
         // Não é necessário chamar o método Update() do DbSet, pois o Entity Framework rastreia as entidades.
+        _context.SaveChanges();
+
+        // Mapeando os dados para um DTO (Data Transfer Object).
+        var regiaoDTO = new RegiaoDTO
+        {
+            Id = regiao.Id,
+            Codigo = regiao.Codigo,
+            Nome = regiao.Nome,
+            ImagemUrl = regiao.ImagemUrl
+        };
+
+        // Ok() é um método que retorna um status 200.
+        return Ok(regiaoDTO);
+    }
+
+    [HttpDelete]
+    [Route("{id:Guid}")]
+    public IActionResult Deletar([FromRoute] Guid id)
+    {
+        // Obtendo dados do banco de dados. Domain Model.
+        var regiao = _context.Regioes.FirstOrDefault(r => r.Id == id);
+
+        if (regiao == null)
+        {
+            // NotFound() é um método que retorna um status 404.
+            return NotFound();
+        }
+
+        // Removendo a entidade do contexto.
+        _context.Regioes.Remove(regiao);
         _context.SaveChanges();
 
         // Mapeando os dados para um DTO (Data Transfer Object).
