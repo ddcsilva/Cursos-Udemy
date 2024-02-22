@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
@@ -6,6 +7,12 @@ using NZWalks.API.Models.DTO;
 using NZWalks.API.Repositories;
 
 namespace NZWalks.API.Controllers;
+
+/*
+    Métodos Assíncronos:
+    A vantagem de usar async/await é que a thread do servidor não é bloqueada enquanto a query é executada.
+    Isso permite que o servidor atenda a mais requisições.
+*/
 
 /// <summary>
 /// Controller para a entidade Regiao.
@@ -16,11 +23,13 @@ public class RegioesController : ControllerBase
 {
     private readonly NZWalksDbContext _context;
     private readonly IRegiaoRepository _regiaoRepository;
+    private readonly IMapper _mapper;
 
-    public RegioesController(NZWalksDbContext context, IRegiaoRepository regiaoRepository)
+    public RegioesController(NZWalksDbContext context, IRegiaoRepository regiaoRepository, IMapper mapper)
     {
         _context = context;
         _regiaoRepository = regiaoRepository;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -30,27 +39,12 @@ public class RegioesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> ObterTodos()
     {
-        // A vantagem de usar async/await é que a thread do servidor não é bloqueada enquanto a query é executada.
-        // Isso permite que o servidor atenda a mais requisições.
-
         // Obtendo dados do banco de dados. Domain Model.
         var regioes = await _regiaoRepository.ObterTodosAsync();
 
         // Mapeando os dados para um DTO (Data Transfer Object).
-        var regioesDTO = new List<RegiaoDTO>();
-        foreach (var regiaoDomain in regioes)
-        {
-            regioesDTO.Add(new RegiaoDTO
-            {
-                Id = regiaoDomain.Id,
-                Codigo = regiaoDomain.Codigo,
-                Nome = regiaoDomain.Nome,
-                ImagemUrl = regiaoDomain.ImagemUrl
-            });
-        }
-
         // Ok() é um método que retorna um status 200.
-        return Ok(regioes);
+        return Ok(_mapper.Map<List<RegiaoDTO>>(regioes));
     }
 
     /// <summary>
@@ -72,15 +66,8 @@ public class RegioesController : ControllerBase
         }
 
         // Mapeando os dados para um DTO (Data Transfer Object).
-        var regiaoDTO = new RegiaoDTO
-        {
-            Id = regiao.Id,
-            Codigo = regiao.Codigo,
-            Nome = regiao.Nome,
-            ImagemUrl = regiao.ImagemUrl
-        };
-
-        return Ok(regiaoDTO);
+        // Ok() é um método que retorna um status 200.
+        return Ok(_mapper.Map<RegiaoDTO>(regiao));
     }
 
     /// <summary>
@@ -92,24 +79,13 @@ public class RegioesController : ControllerBase
     public async Task<IActionResult> Cadastrar([FromBody] CadastrarRegiaoRequestDTO request)
     {
         // Mapeando ou Convertendo os dados do DTO para o Domain Model.
-        var regiao = new Regiao
-        {
-            Codigo = request.Codigo,
-            Nome = request.Nome,
-            ImagemUrl = request.ImagemUrl
-        };
+        var regiao = _mapper.Map<Regiao>(request);
 
         // Adicionando a entidade ao contexto.
         regiao = await _regiaoRepository.AdicionarAsync(regiao);
 
         // Mapeando os dados para um DTO (Data Transfer Object).
-        var regiaoDTO = new RegiaoDTO
-        {
-            Id = regiao.Id,
-            Codigo = regiao.Codigo,
-            Nome = regiao.Nome,
-            ImagemUrl = regiao.ImagemUrl
-        };
+        var regiaoDTO = _mapper.Map<RegiaoDTO>(regiao);
 
         // CreatedAtAction() é um método que retorna um status 201.
         // Ele também retorna um cabeçalho Location com a URL para obter a entidade criada.
@@ -127,13 +103,7 @@ public class RegioesController : ControllerBase
     public async Task<IActionResult> Atualizar([FromRoute] Guid id, [FromBody] AtualizarRegiaoRequestDTO request)
     {
         // Obtendo dados do banco de dados. Domain Model.
-        var regiao = new Regiao
-        {
-            Id = id,
-            Codigo = request.Codigo,
-            Nome = request.Nome,
-            ImagemUrl = request.ImagemUrl
-        };
+        var regiao = await _regiaoRepository.ObterPorIdAsync(id);
 
         regiao = await _regiaoRepository.AtualizarAsync(id, regiao);
 
@@ -144,16 +114,8 @@ public class RegioesController : ControllerBase
         }
 
         // Mapeando os dados para um DTO (Data Transfer Object).
-        var regiaoDTO = new RegiaoDTO
-        {
-            Id = regiao.Id,
-            Codigo = regiao.Codigo,
-            Nome = regiao.Nome,
-            ImagemUrl = regiao.ImagemUrl
-        };
-
         // Ok() é um método que retorna um status 200.
-        return Ok(regiaoDTO);
+        return Ok(_mapper.Map<RegiaoDTO>(regiao));
     }
 
     [HttpDelete]
@@ -169,15 +131,7 @@ public class RegioesController : ControllerBase
         }
 
         // Mapeando os dados para um DTO (Data Transfer Object).
-        var regiaoDTO = new RegiaoDTO
-        {
-            Id = regiao.Id,
-            Codigo = regiao.Codigo,
-            Nome = regiao.Nome,
-            ImagemUrl = regiao.ImagemUrl
-        };
-
         // Ok() é um método que retorna um status 200.
-        return Ok(regiaoDTO);
+        return Ok(_mapper.Map<RegiaoDTO>(regiao));
     }
 }
