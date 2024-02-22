@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
+using NZWalks.API.Repositories;
 
 namespace NZWalks.API.Controllers;
 
@@ -14,10 +15,12 @@ namespace NZWalks.API.Controllers;
 public class RegioesController : ControllerBase
 {
     private readonly NZWalksDbContext _context;
+    private readonly IRegiaoRepository _regiaoRepository;
 
-    public RegioesController(NZWalksDbContext context)
+    public RegioesController(NZWalksDbContext context, IRegiaoRepository regiaoRepository)
     {
         _context = context;
+        _regiaoRepository = regiaoRepository;
     }
 
     /// <summary>
@@ -31,8 +34,7 @@ public class RegioesController : ControllerBase
         // Isso permite que o servidor atenda a mais requisições.
 
         // Obtendo dados do banco de dados. Domain Model.
-        // ToList() é um método de extensão que executa a query no banco de dados e retorna uma lista.
-        var regioes = await _context.Regioes.ToListAsync();
+        var regioes = await _regiaoRepository.ObterTodosAsync();
 
         // Mapeando os dados para um DTO (Data Transfer Object).
         var regioesDTO = new List<RegiaoDTO>();
