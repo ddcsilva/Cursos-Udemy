@@ -63,9 +63,7 @@ public class RegioesController : ControllerBase
     public async Task<IActionResult> ObterPorId([FromRoute] Guid id) // FromRoute é um atributo que indica que o parâmetro vem da rota.
     {
         // Obtendo dados do banco de dados. Domain Model.
-        // Find() é um método do Entity Framework que busca uma entidade pelo seu ID.
-        // FirstOrDefault() é um método do Entity Framework que busca uma entidade com base em um predicado.
-        var regiao = await _context.Regioes.FirstOrDefaultAsync(r => r.Id == id);
+        var regiao = await _regiaoRepository.ObterPorIdAsync(id);
 
         if (regiao == null)
         {
@@ -102,8 +100,7 @@ public class RegioesController : ControllerBase
         };
 
         // Adicionando a entidade ao contexto.
-        await _context.Regioes.AddAsync(regiao);
-        await _context.SaveChangesAsync();
+        regiao = await _regiaoRepository.AdicionarAsync(regiao);
 
         // Mapeando os dados para um DTO (Data Transfer Object).
         var regiaoDTO = new RegiaoDTO
@@ -130,23 +127,21 @@ public class RegioesController : ControllerBase
     public async Task<IActionResult> Atualizar([FromRoute] Guid id, [FromBody] AtualizarRegiaoRequestDTO request)
     {
         // Obtendo dados do banco de dados. Domain Model.
-        // FirstOrDefault() é um método do Entity Framework que busca uma entidade com base em um predicado.
-        var regiao = await _context.Regioes.FirstOrDefaultAsync(r => r.Id == id);
+        var regiao = new Regiao
+        {
+            Id = id,
+            Codigo = request.Codigo,
+            Nome = request.Nome,
+            ImagemUrl = request.ImagemUrl
+        };
+
+        regiao = await _regiaoRepository.AtualizarAsync(id, regiao);
 
         if (regiao == null)
         {
             // NotFound() é um método que retorna um status 404.
             return NotFound();
         }
-
-        // Mapendo os dados do DTO para o Domain Model.
-        regiao.Codigo = request.Codigo;
-        regiao.Nome = request.Nome;
-        regiao.ImagemUrl = request.ImagemUrl;
-
-        // Atualizando a entidade no contexto.
-        // Não é necessário chamar o método Update() do DbSet, pois o Entity Framework rastreia as entidades.
-        await _context.SaveChangesAsync();
 
         // Mapeando os dados para um DTO (Data Transfer Object).
         var regiaoDTO = new RegiaoDTO
@@ -165,18 +160,13 @@ public class RegioesController : ControllerBase
     [Route("{id:Guid}")]
     public async Task<IActionResult> Deletar([FromRoute] Guid id)
     {
-        // Obtendo dados do banco de dados. Domain Model.
-        var regiao = await _context.Regioes.FirstOrDefaultAsync(r => r.Id == id);
+        var regiao = await _regiaoRepository.RemoverAsync(id);
 
         if (regiao == null)
         {
             // NotFound() é um método que retorna um status 404.
             return NotFound();
         }
-
-        // Removendo a entidade do contexto.
-        _context.Regioes.Remove(regiao);
-        await _context.SaveChangesAsync();
 
         // Mapeando os dados para um DTO (Data Transfer Object).
         var regiaoDTO = new RegiaoDTO
