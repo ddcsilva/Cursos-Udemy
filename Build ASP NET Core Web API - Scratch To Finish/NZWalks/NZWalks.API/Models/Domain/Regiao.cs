@@ -1,7 +1,8 @@
 ﻿namespace NZWalks.API.Models.Domain;
 
 /// <summary>
-/// Entidade que representa uma região.
+/// Representa uma região geográfica na Nova Zelândia, usada para categorizar trilhas com base em sua localização.
+/// A classificação das trilhas por região facilita aos usuários a busca e seleção de trilhas em áreas específicas de interesse na Nova Zelândia.
 /// </summary>
 public class Regiao
 {

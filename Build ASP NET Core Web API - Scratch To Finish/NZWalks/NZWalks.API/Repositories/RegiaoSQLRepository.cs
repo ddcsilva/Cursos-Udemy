@@ -4,79 +4,91 @@ using NZWalks.API.Models.Domain;
 
 namespace NZWalks.API.Repositories;
 
-/*
-    O padrão de repositório é uma abstração que permite desacoplar a lógica de negócios da lógica de acesso a dados.
-    Isso permite que a lógica de negócios seja independente da lógica de acesso a dados, facilitando a manutenção e a evolução do sistema.
-    É uma boa prática de programação e é amplamente utilizada em sistemas de grande porte.
-*/
-
 /// <summary>
-/// Repositório para a entidade Região.
+/// Implementa o padrão de repositório para a entidade Região, fornecendo métodos específicos para operações de acesso a dados.
+/// Utiliza o Entity Framework para interagir com o banco de dados, abstraindo a complexidade das operações de CRUD (Create, Read, Update, Delete).
 /// </summary>
 public class RegiaoSQLRepository : IRegiaoRepository
 {
-    // O repositório precisa de uma instância do DbContext para acessar o banco de dados.
+    /// <summary>
+    /// Contexto do banco de dados utilizado para acessar as tabelas e realizar operações de banco de dados.
+    /// </summary>
     private readonly NZWalksDbContext _context;
 
-    // O DbContext é injetado no construtor.
+    /// <summary>
+    /// Inicializa uma nova instância do <see cref="RegiaoSQLRepository"/> com o contexto do banco de dados injetado.
+    /// </summary>
+    /// <param name="context">O contexto do banco de dados fornecido via injeção de dependência.</param>
     public RegiaoSQLRepository(NZWalksDbContext context)
     {
         _context = context;
     }
 
+    /// <summary>
+    /// Obtém todas as regiões cadastradas no banco de dados de forma assíncrona.
+    /// </summary>
+    /// <returns>Uma lista de regiões.</returns>
     public async Task<List<Regiao>> ObterTodosAsync()
     {
-        // O método ToListAsync() executa a query no banco de dados e retorna uma lista.
         return await _context.Regioes.ToListAsync();
     }
 
+    /// <summary>
+    /// Busca uma região pelo seu identificador único (ID) de forma assíncrona.
+    /// </summary>
+    /// <param name="id">O ID da região a ser encontrada.</param>
+    /// <returns>A região encontrada ou null se não existir.</returns>
     public async Task<Regiao?> ObterPorIdAsync(Guid id)
     {
-        // FindAsync() é um método do Entity Framework que busca uma entidade pelo seu ID.
-        // FirstOrDefaultAsync() é um método do Entity Framework que busca a primeira entidade que satisfaça a condição.
         return await _context.Regioes.FirstOrDefaultAsync(regiao => regiao.Id == id);
     }
 
+    /// <summary>
+    /// Adiciona uma nova região ao banco de dados de forma assíncrona.
+    /// </summary>
+    /// <param name="regiao">A região a ser adicionada.</param>
+    /// <returns>A região adicionada com seu ID gerado.</returns>
     public async Task<Regiao> AdicionarAsync(Regiao regiao)
     {
-        // AddAsync() é um método do Entity Framework que adiciona uma entidade ao contexto.
-        // SaveChangesAsync() é um método do Entity Framework que salva as mudanças no banco de dados.
         await _context.Regioes.AddAsync(regiao);
         await _context.SaveChangesAsync();
         return regiao;
     }
 
+    /// <summary>
+    /// Atualiza os dados de uma região existente no banco de dados de forma assíncrona.
+    /// </summary>
+    /// <param name="id">O ID da região a ser atualizada.</param>
+    /// <param name="regiao">Os novos dados da região.</param>
+    /// <returns>A região atualizada ou null se a região não existir.</returns>
     public async Task<Regiao?> AtualizarAsync(Guid id, Regiao regiao)
     {
-        // FirstOrDefaultAsync() é um método do Entity Framework que busca a primeira entidade que satisfaça a condição.
-        var regiaoEncontrada = await _context.Regioes.FirstOrDefaultAsync(regiao => regiao.Id == id);
-
+        var regiaoEncontrada = await _context.Regioes.FirstOrDefaultAsync(r => r.Id == id);
         if (regiaoEncontrada == null)
         {
             return null;
         }
-        // Atualiza as propriedades da região encontrada com as propriedades da região passada como parâmetro.
+
         regiaoEncontrada.Codigo = regiao.Codigo;
         regiaoEncontrada.Nome = regiao.Nome;
         regiaoEncontrada.ImagemUrl = regiao.ImagemUrl;
-
-        // SaveChangesAsync() é um método do Entity Framework que salva as mudanças no banco de dados.
         await _context.SaveChangesAsync();
         return regiaoEncontrada;
     }
 
+    /// <summary>
+    /// Remove uma região do banco de dados de forma assíncrona.
+    /// </summary>
+    /// <param name="id">O ID da região a ser removida.</param>
+    /// <returns>A região removida ou null se a região não existir.</returns>
     public async Task<Regiao?> RemoverAsync(Guid id)
     {
-        // FirstOrDefaultAsync() é um método do Entity Framework que busca a primeira entidade que satisfaça a condição.
-        var regiao = await _context.Regioes.FirstOrDefaultAsync(regiao => regiao.Id == id);
-
+        var regiao = await _context.Regioes.FirstOrDefaultAsync(r => r.Id == id);
         if (regiao == null)
         {
             return null;
         }
 
-        // Remove() é um método do Entity Framework que marca a entidade como removida.
-        // SaveChangesAsync() é um método do Entity Framework que salva as mudanças no banco de dados.
         _context.Regioes.Remove(regiao);
         await _context.SaveChangesAsync();
         return regiao;

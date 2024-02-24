@@ -4,44 +4,26 @@ using NZWalks.API.Models.DTO;
 
 namespace NZWalks.API.Mappings;
 
-/*
-    AutoMapper é uma biblioteca que mapeia entidades para DTOs e vice-versa.
-    Isso é útil para desacoplar a lógica de negócios da lógica de apresentação.
-    No construtor da classe, é possível configurar o mapeamento de entidades para DTOs e vice-versa.
-    Exemplo:
-    CreateMap<Regiao, RegiaoDTO>(); -> Mapeia a entidade Regiao para a DTO RegiaoDTO.
-    CreateMap<RegiaoDTO, Regiao>(); -> Mapeia a DTO RegiaoDTO para a entidade Regiao.
-    Ou podemos usar o método ReverseMap() para mapear as propriedades de forma bidirecional.
-    Exemplo:
-    CreateMap<Regiao, RegiaoDTO>().ReverseMap(); -> Mapeia a entidade Regiao para a DTO RegiaoDTO e vice-versa.
-
-    Quando os atributos das entidades e das DTOs têm o mesmo nome, não é necessário configurar o mapeamento.
-    Exemplo:
-    public class UsuarioDTO
-    {
-        public string NomeCompleto { get; set; }
-    }
-    public class Usuario
-    {
-        public string Nome { get; set; }
-    }
-
-    CreateMap<Usuario, UsuarioDTO>()
-        .ForMember(dest => dest.NomeCompleto, opt => opt.MapFrom(src => src.Nome)); -> Mapeia a propriedade Nome da entidade Usuario para a propriedade NomeCompleto da DTO UsuarioDTO.
-*/
-
 /// <summary>
-/// Classe para mapear entidades para DTOs e vice-versa.
+/// Configura o mapeamento entre entidades de domínio e Data Transfer Objects (DTOs) usando AutoMapper.
+/// Esta configuração permite a conversão automática entre os objetos de domínio (entidades) e os DTOs,
+/// simplificando as operações de CRUD ao isolar a lógica de apresentação da lógica de negócios.
 /// </summary>
 public class AutoMapperProfiles : Profile
 {
+    /// <summary>
+    /// Define os mapeamentos entre as entidades de domínio e os DTOs.
+    /// </summary>
     public AutoMapperProfiles()
     {
-        // Mapeamento de Regiao para RegiaoDTO e vice-versa.
+        // Mapeia a entidade Regiao para RegiaoDTO e vice-versa, permitindo uma conversão bidirecional
+        // entre a entidade e o DTO. Isso é útil para operações de leitura e escrita envolvendo a entidade Regiao.
         CreateMap<Regiao, RegiaoDTO>().ReverseMap();
-        // Mapeamento de CadastrarRegiaoRequestDTO para Regiao e vice-versa.
+        // Mapeia CadastrarRegiaoRequestDTO para Regiao e vice-versa. Este mapeamento é especialmente útil
+        // para a criação de novas regiões, onde os dados recebidos como DTO são convertidos para uma entidade de domínio.
         CreateMap<CadastrarRegiaoRequestDTO, Regiao>().ReverseMap();
-        // Mapeamento de AtualizarRegiaoRequestDTO para Regiao e vice-versa.
+        // Mapeia AtualizarRegiaoRequestDTO para Regiao e vice-versa. Este mapeamento facilita a atualização
+        // de regiões existentes, permitindo que os dados do DTO sejam mapeados diretamente para a entidade de domínio correspondente.
         CreateMap<AtualizarRegiaoRequestDTO, Regiao>().ReverseMap();
     }
 }

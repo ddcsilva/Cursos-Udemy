@@ -1,11 +1,12 @@
 ﻿namespace NZWalks.API.Models.Domain;
 
 /// <summary>
-/// Entidade que representa uma trilha.
+/// Representa uma trilha na Nova Zelândia, armazenando informações detalhadas sobre cada trilha.
+/// Esta classe serve como um repositório para dados de trilhas, incluindo aspectos como nome, descrição, distância, imagem, dificuldade e a região onde a trilha está localizada.
+/// Os dados coletados aqui facilitam aos usuários a busca e seleção de trilhas baseadas em diferentes critérios, como dificuldade e localização.
 /// </summary>
 public class Trilha
 {
-    // Guid é um tipo de dado que representa um identificador único.
     public Guid Id { get; set; }
     public string Nome { get; set; }
     public string Descricao { get; set; }

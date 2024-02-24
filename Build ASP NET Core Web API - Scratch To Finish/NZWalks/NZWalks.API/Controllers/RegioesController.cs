@@ -1,137 +1,122 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
 using NZWalks.API.Repositories;
 
 namespace NZWalks.API.Controllers;
 
-/*
-    Métodos Assíncronos:
-    A vantagem de usar async/await é que a thread do servidor não é bloqueada enquanto a query é executada.
-    Isso permite que o servidor atenda a mais requisições.
-*/
-
 /// <summary>
-/// Controller para a entidade Regiao.
+/// Controller responsável por gerenciar as operações relacionadas às regiões na aplicação NZWalks.
+/// Fornece funcionalidades para obter, criar, atualizar e deletar regiões.
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class RegioesController : ControllerBase
 {
-    private readonly NZWalksDbContext _context;
     private readonly IRegiaoRepository _regiaoRepository;
     private readonly IMapper _mapper;
 
-    public RegioesController(NZWalksDbContext context, IRegiaoRepository regiaoRepository, IMapper mapper)
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="RegioesController"/>.
+    /// </summary>
+    /// <param name="regiaoRepository">Repositório para operações de dados de região.</param>
+    /// <param name="mapper">Ferramenta para mapeamento entre modelos de domínio e DTOs.</param>
+    public RegioesController(IRegiaoRepository regiaoRepository, IMapper mapper)
     {
-        _context = context;
         _regiaoRepository = regiaoRepository;
         _mapper = mapper;
     }
 
     /// <summary>
-    /// Action para obter todas as regiões.
+    /// Obtém uma lista de todas as regiões.
     /// </summary>
-    /// <returns> Lista de regiões. </returns>
+    /// <returns>Uma ação que resulta em uma resposta HTTP com a lista de regiões.</returns>
     [HttpGet]
     public async Task<IActionResult> ObterTodos()
     {
-        // Obtendo dados do banco de dados. Domain Model.
         var regioes = await _regiaoRepository.ObterTodosAsync();
 
-        // Mapeando os dados para um DTO (Data Transfer Object).
-        // Ok() é um método que retorna um status 200.
+        // O método Ok() retorna um status 200 com os dados das regiões.
         return Ok(_mapper.Map<List<RegiaoDTO>>(regioes));
     }
 
     /// <summary>
-    /// Action para obter uma região pelo seu ID.
+    /// Obtém uma região específica pelo seu identificador único (ID).
     /// </summary>
-    /// <param name="id"> ID da região. </param>
-    /// <returns> Região. </returns>
-    [HttpGet]
-    [Route("{id:Guid}")]
-    public async Task<IActionResult> ObterPorId([FromRoute] Guid id) // FromRoute é um atributo que indica que o parâmetro vem da rota.
+    /// <param name="id">O ID da região a ser obtida.</param>
+    /// <returns>Uma ação que resulta em uma resposta HTTP com os detalhes da região solicitada.</returns>
+    [HttpGet("{id:Guid}")]
+    public async Task<IActionResult> ObterPorId([FromRoute] Guid id) // A anotação [FromRoute] indica que o parâmetro vem da rota.
     {
-        // Obtendo dados do banco de dados. Domain Model.
         var regiao = await _regiaoRepository.ObterPorIdAsync(id);
 
         if (regiao == null)
         {
-            // NotFound() é um método que retorna um status 404.
+            // O método NotFound() retorna um status 404 quando a entidade não é encontrada.
             return NotFound();
         }
 
-        // Mapeando os dados para um DTO (Data Transfer Object).
-        // Ok() é um método que retorna um status 200.
+        // O método Ok() retorna um status 200 com os dados da região.
         return Ok(_mapper.Map<RegiaoDTO>(regiao));
     }
 
     /// <summary>
-    /// Action para cadastrar uma região.
+    /// Adiciona uma nova região.
     /// </summary>
-    /// <param name="request"> DTO com os dados da região. </param>
-    /// <returns> Região cadastrada. </returns>
+    /// <param name="request">O DTO contendo as informações da região a ser adicionada.</param>
+    /// <returns>Uma ação que resulta em uma resposta HTTP indicando o sucesso da operação.</returns>
     [HttpPost]
-    public async Task<IActionResult> Cadastrar([FromBody] CadastrarRegiaoRequestDTO request)
+    public async Task<IActionResult> Adicionar([FromBody] CadastrarRegiaoRequestDTO request)
     {
-        // Mapeando ou Convertendo os dados do DTO para o Domain Model.
-        var regiao = _mapper.Map<Regiao>(request);
-
-        // Adicionando a entidade ao contexto.
-        regiao = await _regiaoRepository.AdicionarAsync(regiao);
-
-        // Mapeando os dados para um DTO (Data Transfer Object).
-        var regiaoDTO = _mapper.Map<RegiaoDTO>(regiao);
-
-        // CreatedAtAction() é um método que retorna um status 201.
-        // Ele também retorna um cabeçalho Location com a URL para obter a entidade criada.
-        return CreatedAtAction(nameof(ObterPorId), new { id = regiao.Id }, regiao);
+        var regiaoModel = _mapper.Map<Regiao>(request);
+        var regiaoCriada = await _regiaoRepository.AdicionarAsync(regiaoModel);
+        // O método CreatedAtAction() retorna um status 201 com os dados da região adicionada.
+        return CreatedAtAction(nameof(ObterPorId), new { id = regiaoCriada.Id }, _mapper.Map<RegiaoDTO>(regiaoCriada));
     }
 
     /// <summary>
-    /// Action para atualizar uma região.
+    /// Atualiza os dados de uma região existente.
     /// </summary>
-    /// <param name="id"> ID da região. </param>
-    /// <param name="request"> DTO com os dados da região. </param>
-    /// <returns> Região atualizada. </returns>
+    /// <param name="id">O ID da região a ser atualizada.</param>
+    /// <param name="request">O DTO contendo as novas informações da região.</param>
+    /// <returns>Uma ação que resulta em uma resposta HTTP indicando o sucesso da operação.</returns>
     [HttpPut]
     [Route("{id:Guid}")]
     public async Task<IActionResult> Atualizar([FromRoute] Guid id, [FromBody] AtualizarRegiaoRequestDTO request)
     {
-        // Obtendo dados do banco de dados. Domain Model.
-        var regiao = await _regiaoRepository.ObterPorIdAsync(id);
+        var regiaoModel = _mapper.Map<Regiao>(request);
 
-        regiao = await _regiaoRepository.AtualizarAsync(id, regiao);
+        regiaoModel = await _regiaoRepository.AtualizarAsync(id, regiaoModel);
 
-        if (regiao == null)
+        if (regiaoModel == null)
         {
-            // NotFound() é um método que retorna um status 404.
+            // O método NotFound() retorna um status 404 quando a entidade não é encontrada.
             return NotFound();
         }
 
-        // Mapeando os dados para um DTO (Data Transfer Object).
-        // Ok() é um método que retorna um status 200.
-        return Ok(_mapper.Map<RegiaoDTO>(regiao));
+        // O método Ok() retorna um status 200 com os dados da região atualizada.
+        return Ok(_mapper.Map<RegiaoDTO>(regiaoModel));
     }
 
+    /// <summary>
+    /// Remove uma região pelo seu ID.
+    /// </summary>
+    /// <param name="id">O ID da região a ser removida.</param>
+    /// <returns>Uma ação que resulta em uma resposta HTTP indicando o sucesso da operação.</returns>
     [HttpDelete]
     [Route("{id:Guid}")]
-    public async Task<IActionResult> Deletar([FromRoute] Guid id)
+    public async Task<IActionResult> Remover([FromRoute] Guid id)
     {
-        var regiao = await _regiaoRepository.RemoverAsync(id);
+        var regiaoRemovida = await _regiaoRepository.RemoverAsync(id);
 
-        if (regiao == null)
+        if (regiaoRemovida == null)
         {
-            // NotFound() é um método que retorna um status 404.
+            // O método NotFound() retorna um status 404 quando a entidade não é encontrada.
             return NotFound();
         }
 
-        // Mapeando os dados para um DTO (Data Transfer Object).
-        // Ok() é um método que retorna um status 200.
-        return Ok(_mapper.Map<RegiaoDTO>(regiao));
+        // O método Ok() retorna um status 200 com os dados da região removida.
+        return Ok(_mapper.Map<RegiaoDTO>(regiaoRemovida));
     }
 }

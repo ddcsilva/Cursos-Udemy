@@ -4,26 +4,41 @@ using NZWalks.API.Models.Domain;
 namespace NZWalks.API.Data;
 
 /// <summary>
-/// Classe de contexto do Entity Framework.
+/// Classe de contexto do Entity Framework Core para o NZWalks API.
+/// Responsável pela configuração das conexões com o banco de dados e mapeamento das entidades.
 /// </summary>
 public class NZWalksDbContext : DbContext
 {
-    // DbContextOptions é uma classe genérica que recebe o tipo do contexto.
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="NZWalksDbContext"/> com as opções de configuração especificadas.
+    /// </summary>
+    /// <param name="options">As opções de configuração para o contexto do Entity Framework Core.</param>
     public NZWalksDbContext(DbContextOptions<NZWalksDbContext> options) : base(options) { }
 
-    // DbSet é uma propriedade que representa uma tabela no banco de dados.
+    /// <summary>
+    /// Representa a tabela Dificuldades no banco de dados.
+    /// </summary>
     public DbSet<Dificuldade> Dificuldades { get; set; }
+
+    /// <summary>
+    /// Representa a tabela Regioes no banco de dados.
+    /// </summary>
     public DbSet<Regiao> Regioes { get; set; }
+
+    /// <summary>
+    /// Representa a tabela Trilhas no banco de dados.
+    /// </summary>
     public DbSet<Trilha> Trilhas { get; set; }
 
+    /// <summary>
+    /// Configura o modelo de entidade que o Entity Framework Core utilizará para criar o banco de dados.
+    /// </summary>
+    /// <param name="modelBuilder">Construtor de modelos utilizado para configurar as entidades para o banco de dados.</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configurações do banco de dados.
         base.OnModelCreating(modelBuilder);
 
-        // Popular a tabela Dificuldade.
-        // Fácil, Moderado, Difícil.
-
+        // Popular a tabela Dificuldade com valores pré-definidos.
         var dificuldades = new List<Dificuldade>
         {
             new Dificuldade { Id = Guid.Parse("1fe2e80f-a470-4c6e-83b8-e3dfd740e55b"), Nome = "Fácil" },
@@ -33,9 +48,7 @@ public class NZWalksDbContext : DbContext
 
         modelBuilder.Entity<Dificuldade>().HasData(dificuldades);
 
-        // Popular a tabela Regiao.
-        // Northland, Auckland, Waikato, Bay of Plenty, Gisborne, Hawke's Bay, Taranaki, Manawatu-Wanganui
-
+        // Popular a tabela Regiao com valores pré-definidos.
         var regioes = new List<Regiao>
         {
             new Regiao { Id = Guid.Parse("f3e3e80f-a470-4c6e-83b8-e3dfd740e55b"), Codigo = "NLD", Nome = "Northland", ImagemUrl = "https://www.doc.govt.nz/globalassets/images/conservation/parks-and-recreation/places-to-visit/north"},
@@ -51,4 +64,3 @@ public class NZWalksDbContext : DbContext
         modelBuilder.Entity<Regiao>().HasData(regioes);
     }
 }
-
