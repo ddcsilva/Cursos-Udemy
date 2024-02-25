@@ -8,7 +8,7 @@ namespace NZWalks.API.Repositories;
 /// Implementa o padrão de repositório para a entidade Região, fornecendo métodos específicos para operações de acesso a dados.
 /// Utiliza o Entity Framework para interagir com o banco de dados, abstraindo a complexidade das operações de CRUD (Create, Read, Update, Delete).
 /// </summary>
-public class RegiaoSQLRepository : IRegiaoRepository
+public class RegiaoRepository : IRegiaoRepository
 {
     /// <summary>
     /// Contexto do banco de dados utilizado para acessar as tabelas e realizar operações de banco de dados.
@@ -16,10 +16,10 @@ public class RegiaoSQLRepository : IRegiaoRepository
     private readonly NZWalksDbContext _context;
 
     /// <summary>
-    /// Inicializa uma nova instância do <see cref="RegiaoSQLRepository"/> com o contexto do banco de dados injetado.
+    /// Inicializa uma nova instância do <see cref="RegiaoRepository"/> com o contexto do banco de dados injetado.
     /// </summary>
     /// <param name="context">O contexto do banco de dados fornecido via injeção de dependência.</param>
-    public RegiaoSQLRepository(NZWalksDbContext context)
+    public RegiaoRepository(NZWalksDbContext context)
     {
         _context = context;
     }

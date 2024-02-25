@@ -1,9 +1,9 @@
 namespace NZWalks.API.Models.DTO;
 
 /// <summary>
-/// Representa os dados necessários para atualizar uma região na Nova Zelândia.
+/// Representa os dados necessários para adicionar uma nova região ao banco de dados.
 /// </summary>
-public class CadastrarRegiaoRequestDTO
+public class AdicionarRegiaoRequestDTO
 {
     public string Codigo { get; set; }
     public string Nome { get; set; }

@@ -1,7 +1,7 @@
 namespace NZWalks.API.Models.DTO;
 
 /// <summary>
-/// Representa uma região geográfica na Nova Zelândia.
+/// Representa uma região para ser exibida na aplicação.
 /// </summary>
 public class RegiaoDTO
 {

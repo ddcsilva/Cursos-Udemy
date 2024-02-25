@@ -8,7 +8,7 @@ namespace NZWalks.API.Controllers;
 
 /// <summary>
 /// Controller responsável por gerenciar as operações relacionadas às regiões na aplicação NZWalks.
-/// Fornece funcionalidades para obter, criar, atualizar e deletar regiões.
+/// Fornece funcionalidades para obter, adicionar, atualizar e remover regiões.
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
@@ -36,8 +36,6 @@ public class RegioesController : ControllerBase
     public async Task<IActionResult> ObterTodos()
     {
         var regioes = await _regiaoRepository.ObterTodosAsync();
-
-        // O método Ok() retorna um status 200 com os dados das regiões.
         return Ok(_mapper.Map<List<RegiaoDTO>>(regioes));
     }
 
@@ -47,17 +45,15 @@ public class RegioesController : ControllerBase
     /// <param name="id">O ID da região a ser obtida.</param>
     /// <returns>Uma ação que resulta em uma resposta HTTP com os detalhes da região solicitada.</returns>
     [HttpGet("{id:Guid}")]
-    public async Task<IActionResult> ObterPorId([FromRoute] Guid id) // A anotação [FromRoute] indica que o parâmetro vem da rota.
+    public async Task<IActionResult> ObterPorId([FromRoute] Guid id)
     {
         var regiao = await _regiaoRepository.ObterPorIdAsync(id);
 
         if (regiao == null)
         {
-            // O método NotFound() retorna um status 404 quando a entidade não é encontrada.
             return NotFound();
         }
 
-        // O método Ok() retorna um status 200 com os dados da região.
         return Ok(_mapper.Map<RegiaoDTO>(regiao));
     }
 
@@ -67,11 +63,10 @@ public class RegioesController : ControllerBase
     /// <param name="request">O DTO contendo as informações da região a ser adicionada.</param>
     /// <returns>Uma ação que resulta em uma resposta HTTP indicando o sucesso da operação.</returns>
     [HttpPost]
-    public async Task<IActionResult> Adicionar([FromBody] CadastrarRegiaoRequestDTO request)
+    public async Task<IActionResult> Adicionar([FromBody] AdicionarRegiaoRequestDTO request)
     {
         var regiaoModel = _mapper.Map<Regiao>(request);
         var regiaoCriada = await _regiaoRepository.AdicionarAsync(regiaoModel);
-        // O método CreatedAtAction() retorna um status 201 com os dados da região adicionada.
         return CreatedAtAction(nameof(ObterPorId), new { id = regiaoCriada.Id }, _mapper.Map<RegiaoDTO>(regiaoCriada));
     }
 
@@ -91,11 +86,9 @@ public class RegioesController : ControllerBase
 
         if (regiaoModel == null)
         {
-            // O método NotFound() retorna um status 404 quando a entidade não é encontrada.
             return NotFound();
         }
 
-        // O método Ok() retorna um status 200 com os dados da região atualizada.
         return Ok(_mapper.Map<RegiaoDTO>(regiaoModel));
     }
 
@@ -112,11 +105,9 @@ public class RegioesController : ControllerBase
 
         if (regiaoRemovida == null)
         {
-            // O método NotFound() retorna um status 404 quando a entidade não é encontrada.
             return NotFound();
         }
 
-        // O método Ok() retorna um status 200 com os dados da região removida.
-        return Ok(_mapper.Map<RegiaoDTO>(regiaoRemovida));
+        return NoContent();
     }
 }
