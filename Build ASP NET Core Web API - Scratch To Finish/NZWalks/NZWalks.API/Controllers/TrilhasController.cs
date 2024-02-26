@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using NZWalks.API.CustomActionFilters;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
 using NZWalks.API.Repositories;
@@ -63,6 +64,7 @@ public class TrilhasController : ControllerBase
     /// <param name="request">Os dados da trilha a ser adicionada.</param>
     /// <returns>Uma ação que resulta em uma resposta HTTP com a trilha adicionada.</returns>
     [HttpPost]
+    [ValidateModel]
     public async Task<IActionResult> Adicionar([FromBody] AdicionarTrilhaRequestDTO request)
     {
         var trilhaModel = _mapper.Map<Trilha>(request);
@@ -77,6 +79,7 @@ public class TrilhasController : ControllerBase
     /// <param name="request">Os novos dados da trilha.</param>
     /// <returns>Uma ação que resulta em uma resposta HTTP com a trilha atualizada.</returns>
     [HttpPut("{id:Guid}")]
+    [ValidateModel]
     public async Task<IActionResult> Atualizar([FromRoute] Guid id, [FromBody] AtualizarTrilhaRequestDTO request)
     {
         var trilhaModel = _mapper.Map<Trilha>(request);
@@ -95,8 +98,14 @@ public class TrilhasController : ControllerBase
     /// </summary>
     /// <param name="id">O ID da trilha a ser removida.</param>
     /// <returns>Uma ação que resulta em uma resposta HTTP sem conteúdo.</returns>
+    [HttpDelete("{id:Guid}")]
     public async Task<IActionResult> Remover([FromRoute] Guid id)
     {
+        if (id == Guid.Empty)
+        {
+            return BadRequest();
+        }
+
         var trilhaRemovida = await _trilhaRepository.RemoverAsync(id);
 
         if (trilhaRemovida == null)

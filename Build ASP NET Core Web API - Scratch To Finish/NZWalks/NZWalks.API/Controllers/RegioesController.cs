@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using NZWalks.API.CustomActionFilters;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
 using NZWalks.API.Repositories;
@@ -63,6 +64,7 @@ public class RegioesController : ControllerBase
     /// <param name="request">O DTO contendo as informações da região a ser adicionada.</param>
     /// <returns>Uma ação que resulta em uma resposta HTTP indicando o sucesso da operação.</returns>
     [HttpPost]
+    [ValidateModel]
     public async Task<IActionResult> Adicionar([FromBody] AdicionarRegiaoRequestDTO request)
     {
         var regiaoModel = _mapper.Map<Regiao>(request);
@@ -78,6 +80,7 @@ public class RegioesController : ControllerBase
     /// <returns>Uma ação que resulta em uma resposta HTTP indicando o sucesso da operação.</returns>
     [HttpPut]
     [Route("{id:Guid}")]
+    [ValidateModel]
     public async Task<IActionResult> Atualizar([FromRoute] Guid id, [FromBody] AtualizarRegiaoRequestDTO request)
     {
         var regiaoModel = _mapper.Map<Regiao>(request);
@@ -86,7 +89,7 @@ public class RegioesController : ControllerBase
 
         if (regiaoModel == null)
         {
-            return NotFound();
+            return NotFound("A região não foi encontrada.");
         }
 
         return Ok(_mapper.Map<RegiaoDTO>(regiaoModel));
@@ -101,11 +104,16 @@ public class RegioesController : ControllerBase
     [Route("{id:Guid}")]
     public async Task<IActionResult> Remover([FromRoute] Guid id)
     {
+        if (id == Guid.Empty)
+        {
+            return BadRequest("O ID da região é inválido.");
+        }
+
         var regiaoRemovida = await _regiaoRepository.RemoverAsync(id);
 
         if (regiaoRemovida == null)
         {
-            return NotFound();
+            return NotFound("A região não foi encontrada.");
         }
 
         return NoContent();
