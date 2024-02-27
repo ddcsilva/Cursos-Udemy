@@ -14,7 +14,6 @@ namespace NZWalks.API.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
 public class RegioesController : ControllerBase
 {
     private readonly IRegiaoRepository _regiaoRepository;
@@ -36,6 +35,7 @@ public class RegioesController : ControllerBase
     /// </summary>
     /// <returns>Uma ação que resulta em uma resposta HTTP com a lista de regiões.</returns>
     [HttpGet]
+    [Authorize(Roles = "Reader")]
     public async Task<IActionResult> ObterTodos()
     {
         var regioes = await _regiaoRepository.ObterTodosAsync();
@@ -48,6 +48,8 @@ public class RegioesController : ControllerBase
     /// <param name="id">O ID da região a ser obtida.</param>
     /// <returns>Uma ação que resulta em uma resposta HTTP com os detalhes da região solicitada.</returns>
     [HttpGet("{id:Guid}")]
+    [Authorize]
+    [Authorize(Roles = "Reader")]
     public async Task<IActionResult> ObterPorId([FromRoute] Guid id)
     {
         var regiao = await _regiaoRepository.ObterPorIdAsync(id);
@@ -67,6 +69,7 @@ public class RegioesController : ControllerBase
     /// <returns>Uma ação que resulta em uma resposta HTTP indicando o sucesso da operação.</returns>
     [HttpPost]
     [ValidateModel]
+    [Authorize(Roles = "Writer")]
     public async Task<IActionResult> Adicionar([FromBody] AdicionarRegiaoRequestDTO request)
     {
         var regiaoModel = _mapper.Map<Regiao>(request);
@@ -83,6 +86,7 @@ public class RegioesController : ControllerBase
     [HttpPut]
     [Route("{id:Guid}")]
     [ValidateModel]
+    [Authorize(Roles = "Writer")]
     public async Task<IActionResult> Atualizar([FromRoute] Guid id, [FromBody] AtualizarRegiaoRequestDTO request)
     {
         var regiaoModel = _mapper.Map<Regiao>(request);
@@ -104,6 +108,7 @@ public class RegioesController : ControllerBase
     /// <returns>Uma ação que resulta em uma resposta HTTP indicando o sucesso da operação.</returns>
     [HttpDelete]
     [Route("{id:Guid}")]
+    [Authorize(Roles = "Writer")]
     public async Task<IActionResult> Remover([FromRoute] Guid id)
     {
         if (id == Guid.Empty)
