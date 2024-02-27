@@ -30,13 +30,16 @@ public class TrilhasController : ControllerBase
     }
 
     /// <summary>
-    /// Obtém uma lista de todas as trilhas.
+    /// Obtém todas as trilhas cadastradas no sistema, com a opção de filtrar os resultados baseado em um critério específico.
     /// </summary>
+    /// <param name="filtroCritério">Critério pelo qual as trilhas serão filtradas. Atualmente, suporta apenas filtragem pelo "Nome".</param>
+    /// <param name="termoBusca">O termo de busca utilizado para filtrar as trilhas. Corresponde ao nome ou parte do nome da trilha.</param>
     /// <returns>Uma ação que resulta em uma resposta HTTP com a lista de trilhas.</returns>
     [HttpGet]
-    public async Task<IActionResult> ObterTodos()
+    public async Task<IActionResult> ObterTodos([FromQuery] string? filtroCritério = null, [FromQuery] string? termoBusca = null,
+        [FromQuery] string? ordenarPor = null, [FromQuery] bool? ascendente = null, [FromQuery] int pagina = 1, [FromQuery] int tamanhoPagina = 10)
     {
-        var trilhas = await _trilhaRepository.ObterTodosAsync();
+        var trilhas = await _trilhaRepository.ObterTodosAsync(filtroCritério, termoBusca, ordenarPor, ascendente ?? true, pagina, tamanhoPagina);
         return Ok(_mapper.Map<List<TrilhaDTO>>(trilhas));
     }
 

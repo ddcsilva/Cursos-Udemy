@@ -8,11 +8,14 @@ namespace NZWalks.API.Repositories;
 public interface ITrilhaRepository
 {
     /// <summary>
-    /// Recupera uma lista de todas as trilhas cadastradas no sistema.
-    /// Este método é assíncrono e retorna uma lista contendo todas as trilhas disponíveis, facilitando a consulta e seleção de trilhas pelos usuários.
+    /// Obtém todas as trilhas cadastradas no sistema, com a opção de filtrar os resultados baseado em um critério específico.
+    /// A filtragem é opcional e, quando aplicada, permite refinar os resultados da busca com base no nome da trilha.
     /// </summary>
-    /// <returns>Uma tarefa que, ao ser concluída, retorna uma lista de objetos <see cref="Trilha"/>.</returns>
-    Task<List<Trilha>> ObterTodosAsync();
+    /// <param name="filtroCritério">Critério pelo qual as trilhas serão filtradas. Atualmente, suporta apenas filtragem pelo "Nome".</param>
+    /// <param name="termoBusca">O termo de busca utilizado para filtrar as trilhas. Corresponde ao nome ou parte do nome da trilha.</param>
+    /// <returns>Uma lista de trilhas, possivelmente filtrada com base no critério e termo de busca fornecidos.</returns>
+    Task<List<Trilha>> ObterTodosAsync(string? filtroCritério = null, string? termoBusca = null,
+        string? ordenarPor = null, bool ascendente = true, int pagina = 1, int tamanhoPagina = 10);
 
     /// <summary>
     /// Busca uma trilha específica pelo seu identificador único (ID).

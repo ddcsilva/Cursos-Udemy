@@ -25,18 +25,50 @@ public class TrilhaRepository : ITrilhaRepository
     }
 
     /// <summary>
-    /// Obtém todas as trilhas cadastradas no banco de dados de forma assíncrona.
+    /// Obtém todas as trilhas cadastradas no banco de dados, com a opção de filtrar os resultados baseado em um critério específico.
+    /// A filtragem é opcional e, quando aplicada, permite refinar os resultados da busca com base no nome da trilha.
     /// </summary>
-    /// <returns>Uma lista de trilhas.</returns>
-    public async Task<List<Trilha>> ObterTodosAsync()
+    /// <param name="filtroCritério">Critério pelo qual as trilhas serão filtradas. Atualmente, suporta apenas filtragem pelo "Nome".</param>
+    /// <param name="termoBusca">O termo de busca utilizado para filtrar as trilhas. Corresponde ao nome ou parte do nome da trilha.</param>
+    /// <returns>Uma lista de trilhas, possivelmente filtrada com base no critério e termo de busca fornecidos.</returns>
+    public async Task<List<Trilha>> ObterTodosAsync(string? filtroCritério = null, string? termoBusca = null,
+        string? ordenarPor = null, bool ascendente = true, int pagina = 1, int tamanhoPagina = 10)
     {
-        return await _context.Trilhas.Include("Dificuldade").Include("Regiao").ToListAsync();
+        var trilhas = _context.Trilhas.Include("Dificuldade").Include("Regiao").AsQueryable();
+
+        // Aplica o filtro de busca, se fornecido
+        if (!string.IsNullOrWhiteSpace(filtroCritério) && !string.IsNullOrWhiteSpace(termoBusca))
+        {
+            if (filtroCritério.Equals("Nome", StringComparison.OrdinalIgnoreCase))
+            {
+                trilhas = trilhas.Where(t => t.Nome.Contains(termoBusca));
+            }
+        }
+
+        // Aplica a ordenação, se fornecida
+        if (!string.IsNullOrWhiteSpace(ordenarPor))
+        {
+            if (ordenarPor.Equals("Nome", StringComparison.OrdinalIgnoreCase))
+            {
+                trilhas = ascendente ? trilhas.OrderBy(t => t.Nome) : trilhas.OrderByDescending(t => t.Nome);
+            }
+            else if (ordenarPor.Equals("Distancia", StringComparison.OrdinalIgnoreCase))
+            {
+                trilhas = ascendente ? trilhas.OrderBy(t => t.DistanciaEmKm) : trilhas.OrderByDescending(t => t.DistanciaEmKm);
+            }
+        }
+
+        // Aplica a paginação
+        var pularRegistros = (pagina - 1) * tamanhoPagina; // Calcula quantos registros devem ser pulados
+
+        // Retorna a lista de trilhas, aplicando a paginação
+        return await trilhas.Skip(pularRegistros).Take(tamanhoPagina).ToListAsync();
     }
 
     /// <summary>
-    /// Busca uma trilha pelo seu identificador único (ID) de forma assíncrona.
+    /// Obtém uma trilha específica pelo seu identificador único (ID) de forma assíncrona.
     /// </summary>
-    /// <param name="id">O ID da trilha a ser encontrada.</param>
+    /// <param name="id">O ID da trilha a ser buscada.</param>
     /// <returns>A trilha encontrada ou null se não existir.</returns>
     public async Task<Trilha?> ObterPorIdAsync(Guid id)
     {
