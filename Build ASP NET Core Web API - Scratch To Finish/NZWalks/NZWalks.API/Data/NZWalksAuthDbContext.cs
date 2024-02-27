@@ -5,11 +5,19 @@ using Microsoft.EntityFrameworkCore;
 namespace NZWalks.API.Data;
 
 /// <summary>
+/// Representa o contexto de dados para autenticação e autorização na aplicação NZWalks.
 /// </summary>
 public class NZWalksAuthDbContext : IdentityDbContext
 {
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="NZWalksAuthDbContext"/>.
+    /// </summary>
     public NZWalksAuthDbContext(DbContextOptions<NZWalksAuthDbContext> options) : base(options) { }
 
+    /// <summary>
+    /// Configura o modelo de dados para autenticação e autorização na aplicação.
+    /// </summary>
+    /// <param name="builder">O construtor de modelos de dados para o contexto.</param>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -35,6 +43,7 @@ public class NZWalksAuthDbContext : IdentityDbContext
             }
         };
 
+        // Adiciona os papéis de leitor e escritor ao contexto
         builder.Entity<IdentityRole>().HasData(roles);
     }
 }
