@@ -15,30 +15,37 @@ builder.Services.AddControllers();
 
 // Adiciona suporte para a documentação da API.
 builder.Services.AddEndpointsApiExplorer();
+
+// Adiciona suporte para a geração de tokens JWT.
 builder.Services.AddSwaggerGen(options =>
 {
+    // Define as informações da documentação da API.
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "NZWalks API", Version = "v1" });
+    // Define o esquema de autenticação JWT como o esquema padrão.
     options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
     {
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = JwtBearerDefaults.AuthenticationScheme
+        Name = "Authorization", // Define o nome do cabeçalho de autorização.
+        In = ParameterLocation.Header, // Define a localização do cabeçalho de autorização.
+        Type = SecuritySchemeType.ApiKey, // Define o tipo do esquema de segurança como chave de API.
+        Scheme = JwtBearerDefaults.AuthenticationScheme // Define o esquema de segurança como o esquema de autenticação JWT.
     });
 
+    // Define os requisitos de segurança da documentação da API.
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
+            // Define o esquema de segurança JWT como requisito de segurança.
             new OpenApiSecurityScheme
             {
+                // Define o tipo do esquema de segurança como referência de segurança.
                 Reference = new OpenApiReference
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = JwtBearerDefaults.AuthenticationScheme
+                    Type = ReferenceType.SecurityScheme, // Define o tipo da referência de segurança como esquema de segurança.
+                    Id = JwtBearerDefaults.AuthenticationScheme // Define o identificador da referência de segurança como o esquema de autenticação JWT.
                 },
-                Scheme = "oauth2",
-                Name = JwtBearerDefaults.AuthenticationScheme,
-                In = ParameterLocation.Header
+                Scheme = "oauth2", // Define o esquema de segurança como OAuth 2.0.
+                Name = JwtBearerDefaults.AuthenticationScheme, // Define o nome do esquema de segurança como o esquema de autenticação JWT.
+                In = ParameterLocation.Header // Define a localização do esquema de segurança como cabeçalho.
             },
             new List<string>()
         }
@@ -71,20 +78,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme) // De
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])) // Define a chave de assinatura como a especificada no arquivo de configuração.
         });
 
-builder.Services.AddIdentityCore<IdentityUser>()
-    .AddRoles<IdentityRole>()
-    .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("NZWalks")
-    .AddEntityFrameworkStores<NZWalksAuthDbContext>()
-    .AddDefaultTokenProviders();
+// Configuração da autorização de usuários.
+builder.Services.AddIdentityCore<IdentityUser>() // Adiciona o esquema de identidade de usuários.
+    .AddRoles<IdentityRole>() // Adiciona o esquema de papéis de usuários.
+    .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("NZWalks") // Adiciona o provedor de tokens de proteção de dados para o esquema de identidade de usuários.
+    .AddEntityFrameworkStores<NZWalksAuthDbContext>() // Adiciona o esquema de armazenamento de entidades de domínio para o esquema de identidade de usuários.
+    .AddDefaultTokenProviders(); // Adiciona os provedores de tokens padrão para o esquema de identidade de usuários.
 
+// Configuração das opções de identidade de usuários.
 builder.Services.Configure<IdentityOptions>(options =>
 {
-    options.Password.RequireDigit = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequiredLength = 6;
-    options.Password.RequiredUniqueChars = 1;
+    options.Password.RequireDigit = false; // Define que a senha não precisa conter dígitos.
+    options.Password.RequireLowercase = false; // Define que a senha não precisa conter letras minúsculas.
+    options.Password.RequireNonAlphanumeric = false; // Define que a senha não precisa conter caracteres não alfanuméricos.
+    options.Password.RequireUppercase = false; // Define que a senha não precisa conter letras maiúsculas.
+    options.Password.RequiredLength = 6; // Define que a senha precisa ter no mínimo 6 caracteres.
+    options.Password.RequiredUniqueChars = 1; // Define que a senha precisa ter no mínimo 1 caractere único.
 });
 
 var app = builder.Build();

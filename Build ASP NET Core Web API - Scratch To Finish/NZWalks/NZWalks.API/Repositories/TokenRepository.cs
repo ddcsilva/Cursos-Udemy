@@ -6,6 +6,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace NZWalks.API.Repositories;
 
+/// <summary>
+/// Classe responsável por representar o repositório de tokens.
+/// </summary>
 public class TokenRepository : ITokenRepository
 {
     private readonly IConfiguration _configuration;
@@ -15,10 +18,18 @@ public class TokenRepository : ITokenRepository
         _configuration = configuration;
     }
 
+    /// <summary>
+    /// Cria um token JWT para um usuário com os papéis fornecidos.
+    /// </summary>
+    /// <param name="usuario">O usuário para o qual o token será criado.</param>
+    /// <param name="papeis">Os papéis que o usuário possui.</param>
+    /// <returns>O token JWT criado.</returns>
     public string CriarTokenJWT(IdentityUser usuario, IList<string> papeis)
     {
-        var claims = new List<Claim>();
-        claims.Add(new Claim(ClaimTypes.Email, usuario.Email));
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Email, usuario.Email)
+        };
 
         foreach (var papel in papeis)
         {
