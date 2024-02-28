@@ -4,9 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bulky.Models;
 
-/// <summary>
-/// Classe que representa a tabela Produto
-/// </summary>
 public class Produto
 {
     [Key]
@@ -49,7 +46,6 @@ public class Produto
     [Display(Name = "Imagem")]
     public string ImagemUrl { get; set; }
 
-    // Relacionamento com a tabela Categoria
     public int CategoriaId { get; set; }
 
     [ValidateNever]
