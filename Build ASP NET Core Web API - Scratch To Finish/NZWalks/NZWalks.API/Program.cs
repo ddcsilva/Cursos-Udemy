@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NZWalks.API.Data;
@@ -12,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Adiciona suporte para controllers ao aplicativo.
 builder.Services.AddControllers();
+
+builder.Services.AddHttpContextAccessor();
 
 // Adiciona suporte para a documentação da API.
 builder.Services.AddEndpointsApiExplorer();
@@ -60,6 +63,7 @@ builder.Services.AddDbContext<NZWalksAuthDbContext>(options => options.UseSqlSer
 builder.Services.AddScoped<IRegiaoRepository, RegiaoRepository>(); // Lê-se: "Sempre que um objeto do tipo IRegiaoRepository for necessário, crie um objeto do tipo RegiaoSQLRepository."
 builder.Services.AddScoped<ITrilhaRepository, TrilhaRepository>(); // Lê-se: "Sempre que um objeto do tipo ITrilhaRepository for necessário, crie um objeto do tipo TrilhaSQLRepository."
 builder.Services.AddScoped<ITokenRepository, TokenRepository>(); // Lê-se: "Sempre que um objeto do tipo ITokenRepository for necessário, crie um objeto do tipo TokenRepository."
+builder.Services.AddScoped<IImagemRepository, ImagemLocalRepository>(); // Lê-se: "Sempre que um objeto do tipo IImagemRepository for necessário, crie um objeto do tipo ImagemLocalRepository."
 
 // Configura o AutoMapper para mapear automaticamente as entidades de domínio para os DTOs e vice-versa.
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
@@ -115,6 +119,12 @@ app.UseAuthentication();
 
 // Middleware que habilita a autorização de usuários.
 app.UseAuthorization();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Imagens")),
+    RequestPath = "/Imagens"
+});
 
 // Middleware que habilita a rota de requisições para os controllers.
 app.MapControllers();

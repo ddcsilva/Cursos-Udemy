@@ -31,6 +31,11 @@ public class NZWalksDbContext : DbContext
     public DbSet<Trilha> Trilhas { get; set; }
 
     /// <summary>
+    /// Representa a tabela Imagens no banco de dados.
+    /// </summary>
+    public DbSet<Imagem> Imagens { get; set; }
+
+    /// <summary>
     /// Configura o modelo de entidade que o Entity Framework Core utilizará para criar o banco de dados.
     /// </summary>
     /// <param name="modelBuilder">Construtor de modelos utilizado para configurar as entidades para o banco de dados.</param>
