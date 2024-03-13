@@ -41,8 +41,9 @@ public class VillaAPIController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public ActionResult<VillaDTO> AdicionarVilla([FromBody] VillaDTO villaDTO)
     {
-        if (!ModelState.IsValid)
+        if (VillaStore.Villas.FirstOrDefault(v => v.Nome == villaDTO.Nome) != null)
         {
+            ModelState.AddModelError("Nome", "Nome já existe");
             return BadRequest(ModelState);
         }
 
