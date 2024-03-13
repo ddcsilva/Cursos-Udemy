@@ -2,7 +2,7 @@
 
 namespace MagicVilla.API.Models.DTO;
 
-public class VillaDTO
+public class VilaDTO
 {
     public int Id { get; set; }
 
@@ -10,7 +10,15 @@ public class VillaDTO
     [MaxLength(30)]
     public string Nome { get; set; }
 
+    public string Detalhes { get; set; }
+
+    public double Avaliacao { get; set; }
+
     public int Quartos { get; set; }
 
-    public int Banheiros { get; set; }
+    public int MetrosQuadrados { get; set; }
+
+    public string ImagemUrl { get; set; }
+
+    public string Comodidade { get; set; }
 }
