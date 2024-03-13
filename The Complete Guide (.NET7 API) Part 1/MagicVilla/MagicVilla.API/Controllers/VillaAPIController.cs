@@ -13,4 +13,10 @@ public class VillaAPIController : ControllerBase
     {
         return VillaStore.Villas;
     }
+
+    [HttpGet("{id:int}")]
+    public VillaDTO ObterVilla(int id)
+    {
+        return VillaStore.Villas.FirstOrDefault(v => v.Id == id);
+    }
 }
