@@ -34,4 +34,26 @@ public class VillaAPIController : ControllerBase
 
         return Ok(VillaStore.Villas.FirstOrDefault(v => v.Id == id));
     }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public ActionResult<VillaDTO> AdicionarVilla([FromBody] VillaDTO villaDTO)
+    {
+        if (villaDTO == null)
+        {
+            return BadRequest(villaDTO);
+        }
+
+        if (villaDTO.Id > 0)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        villaDTO.Id = VillaStore.Villas.OrderByDescending(v => v.Id).FirstOrDefault().Id + 1;
+        VillaStore.Villas.Add(villaDTO);
+
+        return Ok(villaDTO);
+    }
 }
