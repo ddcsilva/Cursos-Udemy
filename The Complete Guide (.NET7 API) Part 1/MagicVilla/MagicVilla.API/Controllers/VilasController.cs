@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using MagicVilla.API.Data;
 using MagicVilla.API.Logging;
 using MagicVilla.API.Models;
 using MagicVilla.API.Models.DTO;
+using MagicVilla.API.Repository.IRepository;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,13 +13,13 @@ namespace MagicVilla.API.Controllers;
 [ApiController]
 public class VilasController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IVilaRepository _vilaRepository;
     private readonly ILogging _logger;
     private readonly IMapper _mapper;
 
-    public VilasController(ApplicationDbContext context, ILogging logger, IMapper mapper)
+    public VilasController(IVilaRepository vilaRepository, ILogging logger, IMapper mapper)
     {
-        _context = context;
+        _vilaRepository = vilaRepository;
         _logger = logger;
         _mapper = mapper;
     }
@@ -28,7 +28,7 @@ public class VilasController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<VilaDTO>>> ObterVilas()
     {
-        IEnumerable<Vila> vilas = await _context.Vilas.ToListAsync();
+        IEnumerable<Vila> vilas = await _vilaRepository.ObterTodos();
 
         _logger.Log("Obtendo todas as Villas", "info");
         return Ok(_mapper.Map<IEnumerable<VilaDTO>>(vilas));
@@ -46,7 +46,7 @@ public class VilasController : ControllerBase
             return BadRequest();
         }
 
-        var vila = await _context.Vilas.FirstOrDefaultAsync(v => v.Id == id);
+        var vila = await _vilaRepository.Obter(v => v.Id == id);
 
         if (vila == null)
         {
@@ -70,7 +70,7 @@ public class VilasController : ControllerBase
             return BadRequest(criarVilaDTO);
         }
 
-        if (_context.Vilas.FirstOrDefault(v => v.Nome == criarVilaDTO.Nome) != null)
+        if (await _vilaRepository.Obter(v => v.Nome == criarVilaDTO.Nome) != null)
         {
             ModelState.AddModelError("Nome", "Nome já existe");
             _logger.Log("Nome já existe", "error");
@@ -79,8 +79,7 @@ public class VilasController : ControllerBase
 
         Vila model = _mapper.Map<Vila>(criarVilaDTO);
 
-        await _context.Vilas.AddAsync(model);
-        await _context.SaveChangesAsync();
+        await _vilaRepository.Adicionar(model);
 
         _logger.Log($"Vila adicionada: {model.Id}", "info");
         return CreatedAtAction(nameof(ObterVila), new { id = model.Id }, model);
@@ -100,8 +99,7 @@ public class VilasController : ControllerBase
 
         Vila model = _mapper.Map<Vila>(atualizarVilaDTO);
 
-        _context.Vilas.Update(model);
-        await _context.SaveChangesAsync();
+        await _vilaRepository.Atualizar(model);
 
         _logger.Log($"Vila atualizada: {id}", "info");
         return NoContent();
@@ -119,15 +117,14 @@ public class VilasController : ControllerBase
             return BadRequest();
         }
 
-        var vila = await _context.Vilas.FirstOrDefaultAsync(v => v.Id == id);
+        var vila = await _vilaRepository.Obter(v => v.Id == id);
         if (vila == null)
         {
             _logger.Log($"Vila não encontrada: {id}", "error");
             return NotFound();
         }
 
-        _context.Vilas.Remove(vila);
-        await _context.SaveChangesAsync();
+        await _vilaRepository.Remover(vila);
 
         _logger.Log($"Vila excluída: {id}", "info");
         return NoContent();
@@ -144,7 +141,7 @@ public class VilasController : ControllerBase
             return BadRequest();
         }
 
-        var vila = await _context.Vilas.AsNoTracking().FirstOrDefaultAsync(v => v.Id == id);
+        var vila = await _vilaRepository.Obter(v => v.Id == id, false);
 
         AtualizarVilaDTO vilaDTO = _mapper.Map<AtualizarVilaDTO>(vila);
 
@@ -158,8 +155,7 @@ public class VilasController : ControllerBase
 
         Vila model = _mapper.Map<Vila>(vilaDTO);
 
-        _context.Vilas.Update(model);
-        await _context.SaveChangesAsync();
+        await _vilaRepository.Atualizar(model);
 
         if (!ModelState.IsValid)
         {

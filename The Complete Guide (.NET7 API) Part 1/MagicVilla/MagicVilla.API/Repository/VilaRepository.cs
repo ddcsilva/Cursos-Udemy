@@ -21,6 +21,12 @@ public class VilaRepository : IVilaRepository
         await Salvar();
     }
 
+    public async Task Atualizar(Vila entity)
+    {
+        _context.Vilas.Update(entity);
+        await Salvar();
+    }
+
     public async Task<Vila> Obter(Expression<Func<Vila, bool>> filtro = null, bool rastreado = true)
     {
         IQueryable<Vila> query = _context.Vilas;
