@@ -63,6 +63,24 @@ public class VillaAPIController : ControllerBase
         return CreatedAtAction(nameof(ObterVilla), new { id = villaDTO.Id }, villaDTO);
     }
 
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public ActionResult AtualizarVilla(int id, [FromBody] VillaDTO villaDTO)
+    {
+        if (villaDTO == null || id != villaDTO.Id)
+        {
+            return BadRequest();
+        }
+
+        var villa = VillaStore.Villas.FirstOrDefault(v => v.Id == id);
+        villa.Nome = villaDTO.Nome;
+        villa.Quartos = villaDTO.Quartos;
+        villa.Banheiros = villaDTO.Banheiros;
+
+        return NoContent();
+    }
+
     [HttpDelete("{id:int}", Name = "DeletarVilla")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
