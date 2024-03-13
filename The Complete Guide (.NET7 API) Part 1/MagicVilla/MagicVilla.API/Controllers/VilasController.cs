@@ -57,7 +57,7 @@ public class VilasController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public ActionResult<VilaDTO> AdicionarVila([FromBody] VilaDTO vilaDTO)
+    public ActionResult<VilaDTO> AdicionarVila([FromBody] CriarVilaDTO vilaDTO)
     {
         if (vilaDTO == null)
         {
@@ -72,15 +72,8 @@ public class VilasController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        if (vilaDTO.Id > 0)
-        {
-            ModelState.AddModelError("Id", "Id deve ser gerado pelo sistema");
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
-
         Vila model = new()
         {
-            Id = vilaDTO.Id,
             Nome = vilaDTO.Nome,
             Detalhes = vilaDTO.Detalhes,
             Avaliacao = vilaDTO.Avaliacao,
@@ -93,15 +86,15 @@ public class VilasController : ControllerBase
         _context.Vilas.Add(model);
         _context.SaveChanges();
 
-        _logger.Log($"Vila adicionada: {vilaDTO.Id}", "info");
-        return CreatedAtAction(nameof(ObterVila), new { id = vilaDTO.Id }, vilaDTO);
+        _logger.Log($"Vila adicionada: {model.Id}", "info");
+        return CreatedAtAction(nameof(ObterVila), new { id = model.Id }, model);
     }
 
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult AtualizarVila(int id, [FromBody] VilaDTO villaDTO)
+    public ActionResult AtualizarVila(int id, [FromBody] AtualizarVilaDTO villaDTO)
     {
         if (villaDTO == null || id != villaDTO.Id)
         {
