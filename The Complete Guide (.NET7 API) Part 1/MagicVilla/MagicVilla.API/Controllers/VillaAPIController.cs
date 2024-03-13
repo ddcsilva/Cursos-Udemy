@@ -101,4 +101,31 @@ public class VillaAPIController : ControllerBase
         VillaStore.Villas.Remove(villa);
         return NoContent();
     }
+
+    [HttpPatch("{id:int}", Name = "AtualizarParcialVilla")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public IActionResult AtualizarParcialVilla(int id, [FromBody] JsonPatchDocument<VillaDTO> patch)
+    {
+        if (patch == null || id == 0)
+        {
+            return BadRequest();
+        }
+
+        var villa = VillaStore.Villas.FirstOrDefault(v => v.Id == id);
+
+        if (villa == null)
+        {
+            return NotFound();
+        }
+
+        patch.ApplyTo(villa, ModelState);
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        return NoContent();
+    }
 }
