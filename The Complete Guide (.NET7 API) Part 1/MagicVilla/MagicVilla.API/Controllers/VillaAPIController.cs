@@ -54,6 +54,6 @@ public class VillaAPIController : ControllerBase
         villaDTO.Id = VillaStore.Villas.OrderByDescending(v => v.Id).FirstOrDefault().Id + 1;
         VillaStore.Villas.Add(villaDTO);
 
-        return Ok(villaDTO);
+        return CreatedAtAction(nameof(ObterVilla), new { id = villaDTO.Id }, villaDTO);
     }
 }
