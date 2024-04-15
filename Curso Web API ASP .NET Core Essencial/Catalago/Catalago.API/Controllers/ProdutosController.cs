@@ -31,7 +31,7 @@ public class ProdutosController(CatalogoContext context) : ControllerBase
         }
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int:min(1)}")]
     public ActionResult<Produto> ObterPorId(int id)
     {
         try
@@ -67,7 +67,7 @@ public class ProdutosController(CatalogoContext context) : ControllerBase
         }
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{id:int:min(1)}")]
     public ActionResult Alterar(int id, Produto produto)
     {
         try
@@ -88,7 +88,7 @@ public class ProdutosController(CatalogoContext context) : ControllerBase
         }
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{id:int:min(1)}")]
     public ActionResult Excluir(int id)
     {
         try

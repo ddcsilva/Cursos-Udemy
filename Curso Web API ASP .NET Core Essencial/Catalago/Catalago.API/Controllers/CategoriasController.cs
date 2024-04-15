@@ -51,7 +51,7 @@ public class CategoriasController(CatalogoContext context) : ControllerBase
         }
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int:min(1)}")]
     public ActionResult<Categoria> Obter(int id)
     {
         try
@@ -92,7 +92,7 @@ public class CategoriasController(CatalogoContext context) : ControllerBase
         }
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{id:int:min(1)}")]
     public ActionResult Alterar(int id, Categoria categoria)
     {
         try
@@ -113,7 +113,7 @@ public class CategoriasController(CatalogoContext context) : ControllerBase
         }
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{id:int:min(1)}")]
     public ActionResult Excluir(int id)
     {
         try
