@@ -10,14 +10,9 @@ namespace Catalago.API.Controllers;
 /// </summary>
 [Route("[controller]")]
 [ApiController]
-public class ProdutosController : ControllerBase
+public class ProdutosController(CatalogoContext context) : ControllerBase
 {
-    private readonly CatalogoContext _context;
-
-    public ProdutosController(CatalogoContext context)
-    {
-        _context = context;
-    }
+    private readonly CatalogoContext _context = context;
 
     [HttpGet]
     public ActionResult<IEnumerable<Produto>> Get()
@@ -71,5 +66,21 @@ public class ProdutosController : ControllerBase
         _context.SaveChanges();
 
         return Ok(produto);
+    }
+
+    [HttpDelete("{id:int}")]
+    public ActionResult Delete(int id)
+    {
+        var produto = _context.Produtos.FirstOrDefault(p => p.Id == id);
+
+        if (produto == null)
+        {
+            return NotFound("Produto não encontrado");
+        }
+
+        _context.Produtos.Remove(produto);
+        _context.SaveChanges();
+
+        return NoContent();
     }
 }
