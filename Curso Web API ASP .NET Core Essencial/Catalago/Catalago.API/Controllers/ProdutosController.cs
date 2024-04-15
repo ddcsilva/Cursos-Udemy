@@ -5,9 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Catalago.API.Controllers;
 
-/// <summary>
-/// Controller responsável por gerenciar as operações relacionadas a produtos
-/// </summary>
 [Route("[controller]")]
 [ApiController]
 public class ProdutosController(CatalogoContext context) : ControllerBase
@@ -15,7 +12,7 @@ public class ProdutosController(CatalogoContext context) : ControllerBase
     private readonly CatalogoContext _context = context;
 
     [HttpGet]
-    public ActionResult<IEnumerable<Produto>> Get()
+    public ActionResult<IEnumerable<Produto>> ObterTodos()
     {
         var produtos = _context.Produtos.ToList();
 
@@ -24,11 +21,11 @@ public class ProdutosController(CatalogoContext context) : ControllerBase
             return NotFound("Nenhum produto encontrado");
         }
 
-        return produtos;
+        return Ok(produtos);
     }
 
     [HttpGet("{id:int}")]
-    public ActionResult<Produto> Get(int id)
+    public ActionResult<Produto> ObterPorId(int id)
     {
         var produto = _context.Produtos.FirstOrDefault(p => p.Id == id);
 
@@ -37,11 +34,11 @@ public class ProdutosController(CatalogoContext context) : ControllerBase
             return NotFound("Produto não encontrado");
         }
 
-        return produto;
+        return Ok(produto);
     }
 
     [HttpPost]
-    public ActionResult Post(Produto produto)
+    public ActionResult Incluir(Produto produto)
     {
         if (produto == null)
         {
@@ -51,11 +48,11 @@ public class ProdutosController(CatalogoContext context) : ControllerBase
         _context.Produtos.Add(produto);
         _context.SaveChanges();
 
-        return CreatedAtAction(nameof(Get), new { id = produto.Id }, produto);
+        return CreatedAtAction(nameof(ObterPorId), new { id = produto.Id }, produto);
     }
 
     [HttpPut("{id:int}")]
-    public ActionResult Put(int id, Produto produto)
+    public ActionResult Alterar(int id, Produto produto)
     {
         if (id != produto.Id)
         {
@@ -69,7 +66,7 @@ public class ProdutosController(CatalogoContext context) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    public ActionResult Delete(int id)
+    public ActionResult Excluir(int id)
     {
         var produto = _context.Produtos.FirstOrDefault(p => p.Id == id);
 
