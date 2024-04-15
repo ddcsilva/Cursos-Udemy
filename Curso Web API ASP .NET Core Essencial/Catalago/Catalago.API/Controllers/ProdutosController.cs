@@ -43,4 +43,18 @@ public class ProdutosController : ControllerBase
 
         return produto;
     }
+
+    [HttpPost]
+    public ActionResult Post(Produto produto)
+    {
+        if (produto == null)
+        {
+            return BadRequest("Produto inválido");
+        }
+
+        _context.Produtos.Add(produto);
+        _context.SaveChanges();
+
+        return CreatedAtAction(nameof(Get), new { id = produto.Id }, produto);
+    }
 }
