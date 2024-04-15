@@ -1,6 +1,7 @@
 ﻿using Catalago.Api.Context;
 using Catalago.Api.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Catalago.API.Controllers;
 
@@ -56,5 +57,19 @@ public class ProdutosController : ControllerBase
         _context.SaveChanges();
 
         return CreatedAtAction(nameof(Get), new { id = produto.Id }, produto);
+    }
+
+    [HttpPut("{id:int}")]
+    public ActionResult Put(int id, Produto produto)
+    {
+        if (id != produto.Id)
+        {
+            return BadRequest("Id do produto não corresponde ao id da requisição");
+        }
+
+        _context.Entry(produto).State = EntityState.Modified;
+        _context.SaveChanges();
+
+        return Ok(produto);
     }
 }
