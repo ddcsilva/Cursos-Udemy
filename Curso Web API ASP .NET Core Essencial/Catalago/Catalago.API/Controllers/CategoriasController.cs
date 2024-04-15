@@ -14,7 +14,7 @@ public class CategoriasController(CatalogoContext context) : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<Categoria>> ObterTodos()
     {
-        var categorias = _context.Categorias.ToList();
+        var categorias = _context.Categorias.AsNoTracking().ToList();
 
         if (categorias == null)
         {
@@ -27,7 +27,7 @@ public class CategoriasController(CatalogoContext context) : ControllerBase
     [HttpGet("produtos")]
     public ActionResult<IEnumerable<Categoria>> ObterTodosComProdutos()
     {
-        return Ok(_context.Categorias.Include(c => c.Produtos).ToList());
+        return Ok(_context.Categorias.AsNoTracking().Include(c => c.Produtos).ToList());
     }
 
     [HttpGet("{id:int}")]

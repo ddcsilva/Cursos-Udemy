@@ -14,7 +14,7 @@ public class ProdutosController(CatalogoContext context) : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<Produto>> ObterTodos()
     {
-        var produtos = _context.Produtos.ToList();
+        var produtos = _context.Produtos.AsNoTracking().ToList();
 
         if (produtos == null)
         {
@@ -27,7 +27,7 @@ public class ProdutosController(CatalogoContext context) : ControllerBase
     [HttpGet("{id:int}")]
     public ActionResult<Produto> ObterPorId(int id)
     {
-        var produto = _context.Produtos.FirstOrDefault(p => p.Id == id);
+        var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.Id == id);
 
         if (produto == null)
         {
